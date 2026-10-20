@@ -551,205 +551,53 @@
       new Date().getFullYear();
 
 
+    
     // Little City background music
-    // Generated entirely using the Web Audio API.
-
     const musicBtn = document.getElementById("musicBtn");
     const musicLabel = document.getElementById("musicLabel");
 
-    let audioCtx = null;
-    let musicTimer = null;
-    let musicEnabled = false;
-    let step = 0;
-    let nextNoteTime = 0;
-
-    const tempo = 105;
-    const beatDuration = 60 / tempo;
-
-    const melody = [
-      523.25, 659.25, 783.99, 659.25,
-      587.33, 698.46, 880.00, 698.46,
-      659.25, 783.99, 1046.50, 783.99,
-      587.33, 659.25, 523.25, 392.00
-    ];
-
-    const bass = [
-      261.63,
-      196.00,
-      220.00,
-      174.61
-    ];
-
-    let masterGain = null;
-
-    function initializeAudio() {
-      if (audioCtx) return;
-
-      audioCtx = new (
-        window.AudioContext ||
-        window.webkitAudioContext
-      )();
-
-      masterGain = audioCtx.createGain();
-      masterGain.gain.value = 0.16;
-      masterGain.connect(audioCtx.destination);
-    }
-
-    function playNote(frequency, start, duration, type, volume) {
-      const oscillator = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-
-      oscillator.type = type;
-      oscillator.frequency.setValueAtTime(frequency, start);
-
-      gain.gain.setValueAtTime(0.0001, start);
-      gain.gain.exponentialRampToValueAtTime(
-        volume,
-        start + 0.025
-      );
-      gain.gain.exponentialRampToValueAtTime(
-        0.0001,
-        start + duration
-      );
-
-      oscillator.connect(gain);
-      gain.connect(masterGain);
-
-      oscillator.start(start);
-      oscillator.stop(start + duration + 0.02);
-    }
-
-    function scheduleStep(index, time) {
-      const melodyNote = melody[index % melody.length];
-
-      playNote(
-        melodyNote,
-        time,
-        beatDuration * 0.85,
-        "sine",
-        0.35
-      );
-
-      if (index % 4 === 0) {
-        const bassIndex =
-          Math.floor(index / 4) % bass.length;
-
-        playNote(
-          bass[bassIndex],
-          time,
-          beatDuration * 2.8,
-          "triangle",
-          0.22
-        );
-      }
-
-      if (index % 2 === 0) {
-        playNote(
-          melodyNote / 2,
-          time,
-          beatDuration * 0.5,
-          "sine",
-          0.09
-        );
-      }
-    }
-
-    function scheduler() {
-      if (!musicEnabled || !audioCtx) return;
-
-      while (nextNoteTime < audioCtx.currentTime + 0.12) {
-        scheduleStep(step, nextNoteTime);
-        nextNoteTime += beatDuration;
-        step++;
-      }
-    }
+    const music = new Audio("music.mp3");
+    music.loop = true;
+    music.volume = 0.35;
+    music.preload = "auto";
 
     function updateMusicButton() {
-      musicLabel.textContent =
-        musicEnabled ? "Music On" : "Music Off";
+      const playing = !music.paused;
 
-      musicBtn.setAttribute(
-        "aria-pressed",
-        String(musicEnabled)
-      );
-
+      musicLabel.textContent = playing ? "Music On" : "Music Off";
+      musicBtn.setAttribute("aria-pressed", String(playing));
       musicBtn.setAttribute(
         "aria-label",
-        musicEnabled
-          ? "Turn background music off"
-          : "Turn background music on"
+        playing ? "Turn background music off" : "Turn background music on"
       );
-    }
-
-    async function startMusic() {
-      if (musicEnabled) return;
-
-      initializeAudio();
-      await audioCtx.resume();
-
-      if (musicEnabled) return;
-
-      musicEnabled = true;
-      step = 0;
-      nextNoteTime = audioCtx.currentTime + 0.05;
-
-      masterGain.gain.cancelScheduledValues(
-        audioCtx.currentTime
-      );
-
-      masterGain.gain.setTargetAtTime(
-        0.16,
-        audioCtx.currentTime,
-        0.08
-      );
-
-      musicTimer = setInterval(scheduler, 25);
-      scheduler();
-      updateMusicButton();
-    }
-
-    function stopMusic() {
-      musicEnabled = false;
-
-      if (musicTimer !== null) {
-        clearInterval(musicTimer);
-        musicTimer = null;
-      }
-
-      if (audioCtx && masterGain) {
-        masterGain.gain.cancelScheduledValues(
-          audioCtx.currentTime
-        );
-
-        masterGain.gain.setTargetAtTime(
-          0.0001,
-          audioCtx.currentTime,
-          0.035
-        );
-      }
-
-      updateMusicButton();
     }
 
     musicBtn.addEventListener("click", async () => {
-      if (musicEnabled) {
-        stopMusic();
-      } else {
+      if (music.paused) {
         try {
-          await startMusic();
+          await music.play();
         } catch (error) {
-          console.error("Unable to start music:", error);
+          console.error("Could not play music.mp3:", error);
         }
+      } else {
+        music.pause();
       }
+
+      updateMusicButton();
+    });
+
+    music.addEventListener("play", updateMusicButton);
+    music.addEventListener("pause", updateMusicButton);
+
+    music.addEventListener("error", () => {
+      console.error("Failed to load music.mp3");
+      updateMusicButton();
     });
 
     window.addEventListener("pagehide", () => {
-      stopMusic();
-
-      if (audioCtx) {
-        audioCtx.close().catch(() => {});
-      }
+      music.pause();
     });
+
   </script>
 </body>
 </html>
