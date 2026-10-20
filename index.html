@@ -4,26 +4,57 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#5d9cfb">
+  <meta name="theme-color" content="#8dc9ff">
+  <meta name="description" content="Build, grow, and manage your own city in Little City by Blueblock Games.">
   <link rel="icon" href="web/favicon.svg" type="image/svg+xml">
   <title>Little City | Blueblock Games</title>
+
   <style>
     :root {
       --blue: #3979eb;
-      --dark: #19345e;
-      --sky: #eaf5ff;
-      --white: #fff;
+      --blue-dark: #285dc0;
+      --text: #19345e;
+      --muted: #52708f;
+      --white: #ffffff;
     }
-    * { box-sizing: border-box; }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+    }
+
     body {
       margin: 0;
-      overflow: hidden; !important
       min-height: 100vh;
-      font-family: Arial, Helvetica, system-ui, -apple-system, "Segoe UI", sans-serif;
-      background: linear-gradient(180deg, #8dc9ff 0%, #d8efff 65%, #eaf9df 100%);
-      color: var(--dark);
+      min-height: 100dvh;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(
+        180deg,
+        #8dc9ff 0%,
+        #d8efff 65%,
+        #eaf9df 100%
+      );
+      color: var(--text);
       overflow-x: hidden;
     }
+
+    button, a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button {
+      font-family: inherit;
+    }
+
+    button:focus-visible,
+    a:focus-visible {
+      outline: 3px solid #173d85;
+      outline-offset: 4px;
+    }
+
     header {
       max-width: 1100px;
       margin: auto;
@@ -33,41 +64,57 @@
       justify-content: space-between;
       gap: 16px;
     }
+
     .brand {
-      font-weight: 500;
       font-size: 19px;
-      letter-spacing: -.7px;
+      font-weight: 500;
+      letter-spacing: -0.7px;
+      white-space: nowrap;
     }
-    .brand span { color: var(--blue); }
+
+    .brand span {
+      color: var(--blue);
+    }
+
     .studio {
-      font-size: 13px;
-      font-weight: 550;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
       color: #45688e;
+      text-align: right;
     }
+
     main {
       max-width: 1100px;
       margin: auto;
-      padding: 48px 24px 80px;
+      padding: 48px 24px 45px;
       text-align: center;
     }
+
     .pill {
       display: inline-block;
-      background: #ffffffa8;
-      border: 1px solid #fff;
-      border-radius: 100px;
       padding: 9px 17px;
-      font-size: 13px;
-      font-weight: 750;
+      border-radius: 100px;
+      background: #ffffffa8;
+      border: 1px solid #ffffff;
       color: #3866a1;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
     }
+
     h1 {
-      font-size: clamp(54px, 11vw, 104px);
-      line-height: 1;
-      letter-spacing: -5px;
       margin: 24px 0 18px;
+      font-size: clamp(54px, 11vw, 104px);
       font-weight: 500;
+      line-height: 1.05;
+      letter-spacing: -4px;
     }
-    h1 span { color: var(--blue); }
+
+    h1 span {
+      color: var(--blue);
+    }
+
     .subtitle {
       max-width: 520px;
       margin: 0 auto;
@@ -75,40 +122,79 @@
       font-size: clamp(16px, 2vw, 19px);
       line-height: 1.65;
     }
+
     .actions {
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
+      align-items: center;
       gap: 13px;
       margin-top: 32px;
     }
+
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 9px;
-      padding: 16px 30px;
-      min-width: 150px;
+      min-height: 52px;
+      min-width: 145px;
+      padding: 15px 25px;
       border: 0;
-      border-radius: 17px;
-      font: inherit;
-      font-size: 16px;
-      font-weight: 800;
+      border-radius: 16px;
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.3;
       text-decoration: none;
       cursor: pointer;
-      transition: transform .2s, box-shadow .2s;
+      transition: transform 0.18s, background 0.18s;
     }
-    .btn:hover { transform: translateY(-3px); }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
     .play {
       background: var(--blue);
       color: white;
-      box-shadow: 0 7px 0 #2559b7, 0 13px 25px #3979eb30;
+      box-shadow:
+        0 5px 0 var(--blue-dark),
+        0 10px 22px #3979eb25;
     }
-    .help {
+
+    .play:hover {
+      background: #316edc;
+    }
+
+    .secondary {
       background: white;
-      color: var(--dark);
-      box-shadow: 0 7px 0 #c9dff0;
+      color: var(--text);
+      box-shadow: 0 5px 0 #c9dff0;
     }
+
+    .secondary:hover {
+      background: #f5faff;
+    }
+
+    .music-btn {
+      min-width: 115px;
+    }
+
+    .music-btn[aria-pressed="true"] {
+      background: #e4f1ff;
+      color: #245bb4;
+    }
+
+    .btn svg {
+      width: 19px;
+      height: 19px;
+      flex-shrink: 0;
+    }
+
     .city {
       margin: 55px auto 0;
       max-width: 850px;
@@ -120,14 +206,19 @@
       gap: 12px;
       padding: 0 20px 23px;
       border-bottom: 17px solid #78c67a;
+      user-select: none;
+      pointer-events: none;
     }
+
     .building {
       position: relative;
       width: 85px;
       height: var(--h);
       border-radius: 9px 9px 0 0;
       background: var(--c);
-      box-shadow: inset -12px 0 #00000012, 0 6px 0 #00000010;
+      box-shadow:
+        inset -12px 0 #00000012,
+        0 6px 0 #00000010;
       display: grid;
       grid-template-columns: repeat(2, 16px);
       grid-auto-rows: 20px;
@@ -135,21 +226,31 @@
       align-content: start;
       gap: 14px;
       padding-top: 17px;
+      flex-shrink: 1;
     }
+
     .building i {
       background: #fff5bc;
       border-radius: 3px;
       box-shadow: inset -3px 0 #e6ce83;
     }
-    .building:nth-child(3) { width: 110px; }
-    .building:nth-child(5) { width: 100px; }
+
+    .building:nth-child(3) {
+      width: 110px;
+    }
+
+    .building:nth-child(5) {
+      width: 100px;
+    }
+
     .tree {
       width: 50px;
       height: 75px;
       position: relative;
       flex-shrink: 0;
     }
-    .tree:before {
+
+    .tree::before {
       content: "";
       position: absolute;
       width: 12px;
@@ -158,7 +259,8 @@
       left: 19px;
       background: #98643f;
     }
-    .tree:after {
+
+    .tree::after {
       content: "";
       position: absolute;
       width: 55px;
@@ -169,120 +271,484 @@
       background: #49b96d;
       box-shadow: inset -9px -6px #259e53;
     }
-    .features {
-      margin: 45px auto 0;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      text-align: left;
-    }
-    .feature {
-      padding: 25px;
-      background: #ffffffc9;
-      border: 1px solid white;
-      border-radius: 22px;
-      box-shadow: 0 8px 25px #4783a814;
-    }
-    .feature .symbol { font-size: 30px; margin-bottom: 12px; }
-    .feature h3 { margin: 0 0 8px; font-size: 18px; }
-    .feature p { margin: 0; color: #58718d; line-height: 1.6; font-size: 14px; }
+
     footer {
-      padding: 25px;
+      padding: 22px 20px 30px;
       text-align: center;
-      font-size: 13px;
       color: #58718d;
+      font-size: 13px;
     }
+
     dialog {
-      border: none;
-      border-radius: 25px;
-      padding: 30px;
       width: min(92vw, 460px);
-      color: var(--dark);
+      max-height: min(85vh, 700px);
+      overflow-y: auto;
+      border: none;
+      border-radius: 24px;
+      padding: 30px;
+      background: white;
+      color: var(--text);
       box-shadow: 0 25px 90px #17345b55;
     }
-    dialog::backdrop { background: #142c4a80; backdrop-filter: blur(5px); }
-    dialog h2 { margin-top: 0; }
-    dialog p, dialog li { line-height: 1.7; color: #526b86; }
-    dialog li { margin-bottom: 8px; }
-    dialog .btn { width: 100%; margin-top: 12px; }
-    @media (max-width: 600px) {
-      header { padding: 19px; }
-      main { padding: 48px 18px; }
-      h1 { letter-spacing: -3px; }
-      .features { grid-template-columns: 1fr; }
-      .city { gap: 6px; height: 170px; padding-inline: 4px; }
-      .building { width: 48px; height: calc(var(--h) * .7); grid-template-columns: repeat(2, 9px); grid-auto-rows: 13px; gap: 8px; padding-top: 10px; }
-      .building:nth-child(3), .building:nth-child(5) { width: 65px; }
-      .tree { transform: scale(.65); width: 30px; transform-origin: bottom center; }
-      .actions .btn { flex: 1; min-width: 120px; }
+
+    dialog::backdrop {
+      background: #142c4a80;
+      backdrop-filter: blur(5px);
     }
+
+    dialog h2 {
+      margin: 0 0 12px;
+      font-size: 25px;
+      font-weight: 600;
+    }
+
+    dialog p,
+    dialog li {
+      color: #526b86;
+      line-height: 1.7;
+    }
+
+    dialog ol {
+      padding-left: 23px;
+    }
+
+    dialog li {
+      margin-bottom: 8px;
+    }
+
+    dialog .btn {
+      width: 100%;
+      margin-top: 12px;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        padding: 19px;
+      }
+
+      main {
+        padding: 45px 18px 30px;
+      }
+
+      h1 {
+        letter-spacing: -3px;
+      }
+
+      .actions {
+        gap: 11px;
+      }
+
+      .actions .btn {
+        flex: 1 1 135px;
+        min-width: 0;
+        padding: 14px 12px;
+        font-size: 14px;
+      }
+
+      .music-btn {
+        flex: 0 1 150px !important;
+      }
+
+      .city {
+        gap: 6px;
+        height: 170px;
+        margin-top: 42px;
+        padding-inline: 4px;
+      }
+
+      .building {
+        width: 48px;
+        height: calc(var(--h) * 0.7);
+        grid-template-columns: repeat(2, 9px);
+        grid-auto-rows: 13px;
+        gap: 8px;
+        padding-top: 10px;
+      }
+
+      .building:nth-child(3),
+      .building:nth-child(5) {
+        width: 65px;
+      }
+
+      .tree {
+        transform: scale(0.65);
+        width: 30px;
+        transform-origin: bottom center;
+      }
+
+      dialog {
+        padding: 24px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .studio {
+        font-size: 10px;
+      }
+
+      .city {
+        gap: 3px;
+      }
+
+      .tree {
+        display: none;
+      }
+    }
+
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { transition: none !important; }
+      *,
+      *::before,
+      *::after {
+        transition: none !important;
+      }
     }
   </style>
 </head>
+
 <body>
   <header>
-    <div class="brand">Little <span>City.</span></div>
-    <div class="studio">BLUEBLOCK GAMES</div>
+    <div class="brand">
+      Little <span>City.</span>
+    </div>
+
+    <div class="studio">
+      BLUEBLOCK GAMES
+    </div>
   </header>
 
   <main>
-    <div class="pill">YOUR WORLD, YOUR CREATION</div>
-    <h1>Little <span>City.</span></h1>
+    <div class="pill">
+      YOUR WORLD, YOUR CREATION
+    </div>
+
+    <h1>
+      Little <span>City.</span>
+    </h1>
+
     <p class="subtitle">
-      Big dreams start in a little city. Build, grow, and create
-      your very own world, one building at a time.
+      Big dreams start in a little city.
+      Build, grow, and create your very own world,
+      one building at a time.
     </p>
 
     <div class="actions">
       <a class="btn play" href="web/index.html">
-        <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
           <path d="M7 4.5a1.5 1.5 0 0 1 2.3-1.27l11 7.5a1.5 1.5 0 0 1 0 2.54l-11 7.5A1.5 1.5 0 0 1 7 19.5z"/>
         </svg>
         Play Now
       </a>
-      <button class="btn help" id="helpBtn">
+
+      <button class="btn secondary" id="helpBtn" type="button">
         Help &amp; How to Play
+      </button>
+
+      <button
+        class="btn secondary music-btn"
+        id="musicBtn"
+        type="button"
+        aria-pressed="false"
+        aria-label="Turn background music on"
+      >
+        <svg viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <path d="M9 18V5l12-2v13"/>
+          <circle cx="6" cy="18" r="3"/>
+          <circle cx="18" cy="16" r="3"/>
+        </svg>
+        <span id="musicLabel">Music Off</span>
       </button>
     </div>
 
     <div class="city" aria-hidden="true">
       <div class="tree"></div>
-      <div class="building" style="--h:110px;--c:#f5a95c"><i></i><i></i><i></i><i></i></div>
-      <div class="building" style="--h:160px;--c:#719bed"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-      <div class="building" style="--h:205px;--c:#ffcf62"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-      <div class="building" style="--h:135px;--c:#f18e9e"><i></i><i></i><i></i><i></i></div>
-      <div class="building" style="--h:180px;--c:#8bc8ac"><i></i><i></i><i></i><i></i><i></i></div>
+
+      <div class="building" style="--h:110px;--c:#f5a95c">
+        <i></i><i></i><i></i><i></i>
+      </div>
+
+      <div class="building" style="--h:160px;--c:#719bed">
+        <i></i><i></i><i></i><i></i><i></i><i></i>
+      </div>
+
+      <div class="building" style="--h:205px;--c:#ffcf62">
+        <i></i><i></i><i></i><i></i>
+        <i></i><i></i><i></i><i></i>
+      </div>
+
+      <div class="building" style="--h:135px;--c:#f18e9e">
+        <i></i><i></i><i></i><i></i>
+      </div>
+
+      <div class="building" style="--h:180px;--c:#8bc8ac">
+        <i></i><i></i><i></i><i></i><i></i>
+      </div>
+
       <div class="tree"></div>
     </div>
   </main>
 
+  <footer>
+    &copy; <span id="year">2026</span> Blueblock Games.
+    Small Blocks. Big Ideas.
+  </footer>
+
   <dialog id="helpDialog" aria-labelledby="helpTitle">
     <h2 id="helpTitle">How to Play Little City</h2>
-    <p>Ready to become the mayor? Here's how to get started.</p>
+
+    <p>
+      Ready to become the mayor?
+      Here's how to get started.
+    </p>
+
     <ol>
-      <li><strong>Name your city.</strong> Choose a name for your new world.</li>
-      <li><strong>Start building.</strong> Place roads, houses, and other buildings.</li>
-      <li><strong>Earn money.</strong> Your city generates income over time.</li>
-      <li><strong>Keep expanding.</strong> Add schools, hospitals, parks, and services.</li>
-      <li><strong>Play together.</strong> Use multiplayer features to collaborate with friends.</li>
+      <li>
+        <strong>Name your city.</strong>
+        Choose a name for your new world.
+      </li>
+      <li>
+        <strong>Start building.</strong>
+        Place roads, houses, and other buildings.
+      </li>
+      <li>
+        <strong>Earn money.</strong>
+        Your city generates income over time.
+      </li>
+      <li>
+        <strong>Keep expanding.</strong>
+        Add schools, hospitals, parks, and services.
+      </li>
+      <li>
+        <strong>Play together.</strong>
+        Collaborate with friends using multiplayer features.
+      </li>
     </ol>
-    <button class="btn play" id="closeHelp">Got It!</button>
+
+    <button class="btn play" id="closeHelp" type="button">
+      Got It!
+    </button>
   </dialog>
 
   <script>
-    const dialog = document.getElementById("helpDialog");
+    // Help dialog
 
-    document.getElementById("helpBtn").addEventListener("click", () => {
-      dialog.showModal();
+    const helpDialog = document.getElementById("helpDialog");
+    const helpBtn = document.getElementById("helpBtn");
+    const closeHelp = document.getElementById("closeHelp");
+
+    helpBtn.addEventListener("click", () => {
+      helpDialog.showModal();
     });
 
-    document.getElementById("closeHelp").addEventListener("click", () => {
-      dialog.close();
+    closeHelp.addEventListener("click", () => {
+      helpDialog.close();
     });
 
-    document.getElementById("year").textContent = new Date().getFullYear();
+    document.getElementById("year").textContent =
+      new Date().getFullYear();
+
+
+    // Little City background music
+    // Generated entirely using the Web Audio API.
+
+    const musicBtn = document.getElementById("musicBtn");
+    const musicLabel = document.getElementById("musicLabel");
+
+    let audioCtx = null;
+    let musicTimer = null;
+    let musicEnabled = false;
+    let step = 0;
+    let nextNoteTime = 0;
+
+    const tempo = 105;
+    const beatDuration = 60 / tempo;
+
+    const melody = [
+      523.25, 659.25, 783.99, 659.25,
+      587.33, 698.46, 880.00, 698.46,
+      659.25, 783.99, 1046.50, 783.99,
+      587.33, 659.25, 523.25, 392.00
+    ];
+
+    const bass = [
+      261.63,
+      196.00,
+      220.00,
+      174.61
+    ];
+
+    let masterGain = null;
+
+    function initializeAudio() {
+      if (audioCtx) return;
+
+      audioCtx = new (
+        window.AudioContext ||
+        window.webkitAudioContext
+      )();
+
+      masterGain = audioCtx.createGain();
+      masterGain.gain.value = 0.16;
+      masterGain.connect(audioCtx.destination);
+    }
+
+    function playNote(frequency, start, duration, type, volume) {
+      const oscillator = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      oscillator.type = type;
+      oscillator.frequency.setValueAtTime(frequency, start);
+
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(
+        volume,
+        start + 0.025
+      );
+      gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        start + duration
+      );
+
+      oscillator.connect(gain);
+      gain.connect(masterGain);
+
+      oscillator.start(start);
+      oscillator.stop(start + duration + 0.02);
+    }
+
+    function scheduleStep(index, time) {
+      const melodyNote = melody[index % melody.length];
+
+      playNote(
+        melodyNote,
+        time,
+        beatDuration * 0.85,
+        "sine",
+        0.35
+      );
+
+      if (index % 4 === 0) {
+        const bassIndex =
+          Math.floor(index / 4) % bass.length;
+
+        playNote(
+          bass[bassIndex],
+          time,
+          beatDuration * 2.8,
+          "triangle",
+          0.22
+        );
+      }
+
+      if (index % 2 === 0) {
+        playNote(
+          melodyNote / 2,
+          time,
+          beatDuration * 0.5,
+          "sine",
+          0.09
+        );
+      }
+    }
+
+    function scheduler() {
+      if (!musicEnabled || !audioCtx) return;
+
+      while (nextNoteTime < audioCtx.currentTime + 0.12) {
+        scheduleStep(step, nextNoteTime);
+        nextNoteTime += beatDuration;
+        step++;
+      }
+    }
+
+    function updateMusicButton() {
+      musicLabel.textContent =
+        musicEnabled ? "Music On" : "Music Off";
+
+      musicBtn.setAttribute(
+        "aria-pressed",
+        String(musicEnabled)
+      );
+
+      musicBtn.setAttribute(
+        "aria-label",
+        musicEnabled
+          ? "Turn background music off"
+          : "Turn background music on"
+      );
+    }
+
+    async function startMusic() {
+      if (musicEnabled) return;
+
+      initializeAudio();
+      await audioCtx.resume();
+
+      if (musicEnabled) return;
+
+      musicEnabled = true;
+      step = 0;
+      nextNoteTime = audioCtx.currentTime + 0.05;
+
+      masterGain.gain.cancelScheduledValues(
+        audioCtx.currentTime
+      );
+
+      masterGain.gain.setTargetAtTime(
+        0.16,
+        audioCtx.currentTime,
+        0.08
+      );
+
+      musicTimer = setInterval(scheduler, 25);
+      scheduler();
+      updateMusicButton();
+    }
+
+    function stopMusic() {
+      musicEnabled = false;
+
+      if (musicTimer !== null) {
+        clearInterval(musicTimer);
+        musicTimer = null;
+      }
+
+      if (audioCtx && masterGain) {
+        masterGain.gain.cancelScheduledValues(
+          audioCtx.currentTime
+        );
+
+        masterGain.gain.setTargetAtTime(
+          0.0001,
+          audioCtx.currentTime,
+          0.035
+        );
+      }
+
+      updateMusicButton();
+    }
+
+    musicBtn.addEventListener("click", async () => {
+      if (musicEnabled) {
+        stopMusic();
+      } else {
+        try {
+          await startMusic();
+        } catch (error) {
+          console.error("Unable to start music:", error);
+        }
+      }
+    });
+
+    window.addEventListener("pagehide", () => {
+      stopMusic();
+
+      if (audioCtx) {
+        audioCtx.close().catch(() => {});
+      }
+    });
   </script>
 </body>
 </html>
