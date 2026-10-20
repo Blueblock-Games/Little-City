@@ -1,0 +1,60 @@
+/* Header layout is owned here so all toolbar spacing uses one scale. */
+.game header.gameHeader{
+  --toolbar-gap:8px;
+  display:grid;grid-template-columns:minmax(200px,280px) minmax(0,1fr) auto;
+  grid-template-rows:1fr;align-items:center;gap:16px;
+  height:80px;min-height:80px;flex:none;padding:12px 20px;
+  background:#fff;border-bottom:1px solid #e4eaf1;
+}
+.game header.gameHeader .cityIdentity{display:flex;align-items:center;gap:12px;min-width:0;overflow:hidden}
+.game header.gameHeader .cityIdentity>.brand{display:flex;align-items:center;gap:8px;min-width:0;flex:none;font-size:10px;letter-spacing:1px}
+.game header.gameHeader .brand .logo{width:32px;height:32px;min-width:32px;display:grid;place-items:center;border-radius:9px;font-size:24px}
+.game header.gameHeader .brand small{display:none}
+.game header.gameHeader #cityName{min-width:0;min-height:44px;height:44px;width:auto;max-width:100%;flex:1;padding:0 4px;border:0;border-radius:8px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:15px;font-weight:650;line-height:44px;background:transparent}
+.game header.gameHeader>.stats{grid-column:2;grid-row:1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));width:100%;max-width:520px;justify-self:center;gap:var(--toolbar-gap);margin:0;min-width:0;order:0;align-items:stretch}
+.game header.gameHeader .stats>div{min-width:0;height:48px;display:flex;align-items:center;justify-content:center;gap:8px;padding:8px;border:1px solid #edf0f5;border-radius:10px;background:#f7f9fc}
+.game header.gameHeader .stats small{display:flex;align-items:center;justify-content:center;flex:none;width:18px;height:18px;margin:0;line-height:1;color:#8190a4}
+.game header.gameHeader .stats small .uiIcon{display:block;width:17px;height:17px;margin:0;color:inherit}
+.game header.gameHeader .stats strong{display:block;min-width:0;max-width:100%;font-size:15px;font-weight:650;line-height:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums;letter-spacing:-.25px}
+.game header.gameHeader .headerActions{grid-column:3;grid-row:1;display:flex;align-items:center;justify-content:flex-end;gap:var(--toolbar-gap);min-width:0}
+.game header.gameHeader .headerActions>:is(#worldButton,#coopButton,#menuButton){display:inline-flex;align-items:center;justify-content:center;flex:0 0 44px;grid-column:auto;grid-row:auto;justify-self:auto;width:44px;min-width:44px;max-width:44px;height:44px;min-height:44px;margin:0;padding:0;border:1px solid #e1e7ef;border-radius:11px;background:#f7f9fc;color:#506680;line-height:1;box-shadow:none}
+.game header.gameHeader .headerActions>button:hover{background:#eaf1fc;border-color:#c6d6ed}
+.game header.gameHeader .headerActions .uiIcon{width:21px;height:21px;margin:0}
+.game header.gameHeader #menuButton>span{display:none}
+@media(min-width:901px) and (max-width:1199px){
+  .game header.gameHeader{grid-template-columns:minmax(150px,220px) minmax(0,1fr) auto;gap:12px;padding:12px 16px;height:80px;min-height:80px}
+  .game header.gameHeader .cityIdentity>.brand>span:last-child{display:none}
+  .game header.gameHeader .stats>div{padding:6px;gap:5px}
+  .game header.gameHeader .stats strong{font-size:14px}
+}
+@media(min-width:901px) and (min-height:501px),(min-width:901px) and (pointer:fine){
+  .cityMenu{top:88px;max-height:calc(100dvh - 110px)}
+}
+@media(max-width:900px),(max-height:500px) and (pointer:coarse){
+  .game header.gameHeader{display:grid;grid-template-columns:minmax(0,1fr) 96px;grid-template-rows:44px 52px;gap:10px 12px;height:auto;min-height:0;padding:calc(10px + env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) 10px max(12px,env(safe-area-inset-left))}
+  .game header.gameHeader .cityIdentity{grid-column:1;grid-row:1;gap:10px;min-width:0;height:44px}
+  .game header.gameHeader .cityIdentity>.brand{width:32px;min-width:32px;flex:0 0 32px;overflow:hidden}
+  .game header.gameHeader .cityIdentity>.brand>span:last-child{display:none}
+  .game header.gameHeader #cityName{font-size:15px;padding:0;line-height:44px}
+  .game header.gameHeader .headerActions{grid-column:2;grid-row:1;gap:8px;width:96px;justify-content:flex-end}
+  .game header.gameHeader .headerActions>#worldButton{display:none}
+  .game header.gameHeader>.stats{grid-column:1/-1;grid-row:2;gap:8px;max-width:none;justify-self:stretch;align-self:stretch}
+  .game header.gameHeader .stats>div{height:52px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:3px;padding:5px 3px;border-radius:10px}
+  .game header.gameHeader .stats small{width:16px;height:16px}
+  .game header.gameHeader .stats small .uiIcon{width:15px;height:15px}
+  .game header.gameHeader .stats strong{width:100%;text-align:center;font-size:clamp(11px,3.6vw,15px);line-height:18px;margin:0;letter-spacing:-.25px}
+}
+@media(max-height:500px) and (pointer:coarse){
+  .game header.gameHeader{grid-template-columns:minmax(85px,160px) minmax(0,1fr) 96px;grid-template-rows:44px;gap:10px;height:auto;min-height:0;padding:calc(6px + env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) 6px max(10px,env(safe-area-inset-left))}
+  .game header.gameHeader .cityIdentity{grid-column:1;grid-row:1;gap:7px}
+  .game header.gameHeader>.stats{grid-column:2;grid-row:1;gap:6px}
+  .game header.gameHeader .headerActions{grid-column:3;grid-row:1}
+  .game header.gameHeader .stats>div{height:44px;gap:1px;padding:3px}
+  .game header.gameHeader .stats strong{font-size:12px;line-height:16px}
+  .game header.gameHeader .stats small,.game header.gameHeader .stats small .uiIcon{width:13px;height:13px}
+}
+@media(max-height:500px) and (pointer:coarse) and (max-width:600px){
+  .game header.gameHeader{grid-template-columns:minmax(65px,105px) minmax(0,1fr) 96px;gap:8px}
+  .game header.gameHeader .cityIdentity>.brand{display:none}
+  .game header.gameHeader #cityName{font-size:13px}
+}
