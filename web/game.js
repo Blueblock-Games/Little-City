@@ -1,72 +1,1150 @@
-'use strict';
-const E=CityEngine,G=WorldEngine,$=id=>document.getElementById(id),fmt=n=>'$'+Math.round(n).toLocaleString();
-let world,city,tool=null,category='Essentials',selected=-1,hover=-1,viewOnly=false,cloudEnabled=true;
-try{world=G.validate(JSON.parse(localStorage.getItem('littleCity')));}catch{world=G.fresh(E.fresh('Your city'));}city=G.active(world);
-const canvas=$('map'),ctx=canvas.getContext('2d');let W=0,H=0,scale=1.0,ox=0,oy=0,centered=false,pointers=new Map(),gesture=null,drag=null,lastToast=0;
-const TILE=58;let saveTimer,syncTimer;
-const music=$('backgroundMusic'),DAY_DURATION=5*60*1000,NIGHT_DURATION=2*60*1000;
-let timeMode='auto',isNight=false,nextPhaseAt=Date.now()+DAY_DURATION;
-function syncMusic(){const track=isNight?'../music2.mp3':'../music.mp3';if(music.dataset.track!==track){music.dataset.track=track;music.src=track;music.load();}const playback=music.play();if(playback?.catch)playback.catch(error=>console.warn('Background music playback was blocked:',error));}
-function applyTimeOfDay(night){const changed=isNight!==night;isNight=night;document.body.classList.toggle('night',isNight);if(changed)draw();syncMusic();}
-function updateTimeControls(){if(timeMode==='auto'){const now=Date.now();while(now>=nextPhaseAt){const nextNight=!isNight;nextPhaseAt+=nextNight?NIGHT_DURATION:DAY_DURATION;applyTimeOfDay(nextNight);}}$('dayButton').setAttribute('aria-pressed',String(!isNight));$('nightButton').setAttribute('aria-pressed',String(isNight));$('cycleButton').setAttribute('aria-pressed',String(timeMode==='auto'));$('dayButton').title='Switch to day';$('nightButton').title='Switch to night';$('cycleButton').title='Automatic cycle: 5 minutes day, 2 minutes night';}
-$('dayButton').onclick=()=>{timeMode='manual';applyTimeOfDay(false);updateTimeControls();};
-$('nightButton').onclick=()=>{timeMode='manual';applyTimeOfDay(true);updateTimeControls();};
-$('cycleButton').onclick=()=>{timeMode='auto';nextPhaseAt=Date.now()+DAY_DURATION;applyTimeOfDay(false);updateTimeControls();};
-updateTimeControls();setInterval(updateTimeControls,1000);
-function toast(msg){if($('modal').open){let notice=document.getElementById('modalNotice');if(!notice){notice=document.createElement('p');notice.id='modalNotice';notice.setAttribute('role','status');$('modalContent').prepend(notice);}notice.textContent=msg;}$('toast').textContent=msg;$('toast').classList.add('show');clearTimeout(lastToast);lastToast=setTimeout(()=>$('toast').classList.remove('show'),4500);}
-function persist(){if(viewOnly||window.Coop?.active)return;const unlocked=G.progress(world);G.recalculate(world);if(unlocked)toast(unlocked);try{localStorage.setItem('littleCity',JSON.stringify(world));$('saveState').textContent='Saved on this device';}catch{$('saveState').textContent='Storage full — export a backup';}clearTimeout(syncTimer);syncTimer=setTimeout(sync,1800);}
-async function sync(){if(viewOnly||!cloudEnabled||window.Coop?.active)return;try{const r=await fetch('/api/city',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(world)});if(r.ok)$('saveState').textContent='Saved on device & synced for mayor review';else if(r.status===401)$('saveState').textContent='Local save · sign in to sync';}catch{$('saveState').textContent='Offline · saved on this device';}}
-function rect(c,x,y,w,h,color){c.fillStyle=color;c.fillRect(x,y,w,h);}function circle(c,x,y,r,color){c.fillStyle=color;c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fill();}
-function tree(c,x,y,s=1){window.CityArt.tree(c,x,y,s);}function drawBuilding(c,type,level=1,neigh={}){window.CityArt.building(c,type,level,neigh);}
-function draw(){ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);ctx.clearRect(0,0,W,H);ctx.fillStyle='#edf3e8';ctx.fillRect(0,0,W,H);ctx.save();ctx.translate(ox,oy);ctx.scale(scale,scale);rect(ctx,0,0,E.SIZE*TILE,E.SIZE*TILE,'#e4eddc');ctx.save();ctx.beginPath();ctx.rect(0,0,E.SIZE*TILE,E.SIZE*TILE);ctx.clip();ctx.fillStyle='#dce8d5';for(let patch=0;patch<12;patch++){ctx.beginPath();ctx.ellipse((patch*379+120)%(E.SIZE*TILE),(patch*557+100)%(E.SIZE*TILE),210+(patch%3)*40,140+(patch%4)*20,patch*.6,0,Math.PI*2);ctx.fill();}ctx.restore();let a=Math.max(0,Math.floor(-ox/(TILE*scale))-1),b=Math.min(E.SIZE,Math.ceil((W-ox)/(TILE*scale))+1),d=Math.max(0,Math.floor(-oy/(TILE*scale))-1),e=Math.min(E.SIZE,Math.ceil((H-oy)/(TILE*scale))+1);for(let y=d;y<e;y++)for(let x=a;x<b;x++){let i=y*E.SIZE+x;ctx.save();ctx.translate(x*TILE,y*TILE);if(i%7===0){ctx.strokeStyle='#a8bf9e55';ctx.lineWidth=.8;ctx.beginPath();ctx.moveTo(12,43);ctx.lineTo(10,40);ctx.moveTo(12,43);ctx.lineTo(13,39);ctx.moveTo(12,43);ctx.lineTo(15,41);ctx.stroke();}if(i%31===0){circle(ctx,40,20,1.2,'#c7d6b8');circle(ctx,43,18,.8,'#f4f4d6');}let t=city.tiles[i];if(t)drawBuilding(ctx,t.type,t.level,{left:x>0&&city.tiles[i-1]?.type==='road',right:x<39&&city.tiles[i+1]?.type==='road',up:y>0&&city.tiles[i-40]?.type==='road',down:y<39&&city.tiles[i+40]?.type==='road',seed:i});else if(city.trees[i]){tree(ctx,28,31,.85);if(i%5===0)tree(ctx,44,46,.45);}if(tool){ctx.strokeStyle='#b3c6b746';ctx.lineWidth=.7/scale;ctx.strokeRect(0,0,TILE,TILE);}if(i===selected||i===hover){rect(ctx,0,0,TILE,TILE,i===selected?'#3277eb28':'#ffffff35');ctx.strokeStyle=i===selected?'#3172e2':'#ffffffbb';ctx.lineWidth=2/scale;ctx.strokeRect(1,1,56,56);if(tool&&!t&&i===hover){ctx.globalAlpha=.6;drawBuilding(ctx,tool,1);}}ctx.restore();}ctx.strokeStyle='#d3dfd3';ctx.lineWidth=3;ctx.strokeRect(0,0,E.SIZE*TILE,E.SIZE*TILE);ctx.restore();}
-function resize(){let r=canvas.getBoundingClientRect();const oldW=W,oldH=H;W=r.width;H=r.height;if(centered){ox+=(W-oldW)/2;oy+=(H-oldH)/2;}canvas.width=W*devicePixelRatio;canvas.height=H*devicePixelRatio;if(!centered){center();centered=true;}draw();}
-function center(){ox=W/2-20*TILE*scale;oy=H/2-20*TILE*scale;draw();}function zoom(f,x=W/2,y=H/2){let next=Math.max(.35,Math.min(2.5,scale*f));ox=x-(x-ox)*next/scale;oy=y-(y-oy)*next/scale;scale=next;$('zoomText').textContent=Math.round(scale*100)+'%';draw();}
-function screenPoint(ev){let r=canvas.getBoundingClientRect();return {x:ev.clientX-r.left,y:ev.clientY-r.top};}function tileAt(p){let x=Math.floor((p.x-ox)/scale/TILE),y=Math.floor((p.y-oy)/scale/TILE);return x>=0&&y>=0&&x<E.SIZE&&y<E.SIZE?y*E.SIZE+x:-1;}
-function pick(i){if(i<0)return;if(tool&&!viewOnly&&!city.tiles[i]){if(window.Coop?.active){window.Coop.action('build',{index:i,building:tool});return;}let err=E.build(city,tool,i);if(err)toast(err);else{persist();render();}selected=-1;}else{selected=i;if(city.tiles[i]){tool=null;renderTools();}renderSelected();if(city.tiles[i])window.dispatchEvent(new Event('city-building-selected'));}draw();}
-canvas.addEventListener('pointerdown',ev=>{canvas.focus({preventScroll:true});canvas.setPointerCapture(ev.pointerId);let p=screenPoint(ev);pointers.set(ev.pointerId,p);if(pointers.size===2){let [a,b]=[...pointers.values()];gesture={distance:Math.hypot(a.x-b.x,a.y-b.y),scale};drag=null;}else drag={...p,ox,oy,moved:false};});
-canvas.addEventListener('pointermove',ev=>{let p=screenPoint(ev);hover=tileAt(p);if(pointers.has(ev.pointerId)){pointers.set(ev.pointerId,p);if(pointers.size===2&&gesture){let [a,b]=[...pointers.values()],distance=Math.hypot(a.x-b.x,a.y-b.y);zoom((gesture.scale*distance/gesture.distance)/scale,(a.x+b.x)/2,(a.y+b.y)/2);}else if(drag){if(Math.hypot(p.x-drag.x,p.y-drag.y)>5)drag.moved=true;if(drag.moved){ox=drag.ox+p.x-drag.x;oy=drag.oy+p.y-drag.y;}}}draw();});
-canvas.addEventListener('pointerup',ev=>{if(pointers.size===1&&drag&&!drag.moved&&!gesture)pick(tileAt(screenPoint(ev)));pointers.delete(ev.pointerId);if(!pointers.size){drag=null;gesture=null;}});canvas.addEventListener('pointercancel',()=>{pointers.clear();gesture=null;drag=null;});canvas.addEventListener('pointerleave',()=>{hover=-1;draw();});canvas.addEventListener('wheel',ev=>{ev.preventDefault();let p=screenPoint(ev);zoom(ev.deltaY>0?.9:1.1,p.x,p.y);},{passive:false});
-canvas.addEventListener('keydown',ev=>{let dirs={ArrowLeft:-1,ArrowRight:1,ArrowUp:-40,ArrowDown:40};if(dirs[ev.key]){ev.preventDefault();hover=Math.max(0,Math.min(1599,(hover<0?820:hover)+dirs[ev.key]));let x=hover%40*TILE*scale+ox,y=Math.floor(hover/40)*TILE*scale+oy;if(x<0||x>W-58*scale)ox=W/2-hover%40*TILE*scale;if(y<0||y>H-58*scale)oy=H/2-Math.floor(hover/40)*TILE*scale;draw();}if(ev.key==='Enter')pick(hover<0?820:hover);if(ev.key==='+')zoom(1.2);if(ev.key==='-')zoom(.8);});
-document.addEventListener('keydown',ev=>{if(ev.key==='Escape'){tool=null;selected=-1;render();draw();}});
-function renderTools(){let a=E.stats(city);$('categories').replaceChildren();for(let name of ['Essentials','Homes','Business','Services','Utilities']){let b=document.createElement('button');b.textContent=name;b.className=name===category?'active':'';b.onclick=()=>{category=name;renderTools();};$('categories').append(b);}$('buildList').replaceChildren();for(let [key,c] of Object.entries(E.catalog)){if(c.cat!==category)continue;let b=document.createElement('button');b.className='buildCard'+(tool===key?' active':'');let icon=document.createElement('canvas');icon.width=116;icon.height=116;const iconContext=icon.getContext('2d');iconContext.scale(2,2);drawBuilding(iconContext,key);b.append(icon);let text=document.createElement('span');text.innerHTML=`<b>${c.name}</b><small>${c.unlock>a.level?'City pop '+(c.unlock===2?32:100)+' unlock':(c.pop?'+'+c.pop+' residents':c.income?'+'+fmt(c.income)+'/min':c.expense?fmt(c.expense)+'/min upkeep':'Connect your city')}</small>`;b.append(text);let price=document.createElement('span');price.className='price';price.textContent=fmt(c.cost);b.append(price);b.disabled=viewOnly||(c.unlock||1)>a.level;b.title=c.purpose;b.onclick=()=>{tool=tool===key?null:key;selected=-1;$('tipText').textContent=c.purpose;renderTools();renderSelected();draw();};$('buildList').append(b);}$('toolLabel').textContent=viewOnly?'Read-only city visit':tool?'Building '+E.catalog[tool].name:'Explore mode';}
-function renderSelected(){let box=$('selected');box.replaceChildren();let b=city.tiles[selected];if(!b)return;let c=E.catalog[b.type],a=E.stats(city),title=document.createElement('h3');title.textContent=c.name+' · Level '+b.level;box.append(title);let p=document.createElement('p');p.textContent=c.purpose;box.append(p);const neighborhood=E.neighborhood(city,selected);if(neighborhood.reason){let note=document.createElement('p');note.className='neighborhoodNote';note.textContent=neighborhood.reason;box.append(note);}let details=document.createElement('p');details.textContent=(c.pop?`${c.pop*b.level} residents. `:'')+(c.capacity?`Capacity: ${c.capacity*b.level}. `:'')+(c.income?`Base income ${fmt(c.income*b.level)}/min. `:'')+(c.expense?`Upkeep ${fmt(c.expense*b.level)}/min. `:'')+(b.type!=='road'&&!E.adjacent(city,selected)?'No adjacent road: tax income halved.':'');box.append(details);if(viewOnly)return;let max=b.type==='road'?2:3;if(b.level<max){let btn=document.createElement('button');btn.className='primary wide';btn.textContent=`Upgrade · ${fmt(E.upgradeCost(b))}`;btn.title=b.type==='road'?'Improved road: +0.3 happiness':`Next level: ${(c.pop||c.capacity||c.income||4)*(b.level+1)} ${c.pop?'residents':c.capacity?'capacity':c.income?'base income/min':'park happiness points'}. Maintenance scales with level.`;btn.onclick=()=>{if(window.Coop?.active){window.Coop.action('upgrade',{index:selected,expected:{...city.tiles[selected]}});return;}let err=E.upgrade(city,selected);if(err)toast(err);else{persist();render();draw();}};box.append(btn);let benefit=document.createElement('small');benefit.textContent=b.type==='road'?'Smoother streets · +0.3 happiness':`Next level: ${c.pop?c.pop*(b.level+1)+' residents':c.capacity?c.capacity*(b.level+1)+' service capacity':c.income?fmt(c.income*(b.level+1))+'/min base tax':'more happiness'}${c.expense?' · '+fmt(c.expense*(b.level+1))+'/min upkeep':''}`;box.append(benefit);}let btn=document.createElement('button');btn.className='wide danger';btn.textContent='Demolish · 40% base cost refund';btn.onclick=()=>{if(confirm(`Remove this ${c.name.toLowerCase()}? You will receive ${fmt(Math.floor(c.cost*.4*b.level))}.`)){if(window.Coop?.active){window.Coop.action('demolish',{index:selected,expected:{...city.tiles[selected]}});return;}E.demolish(city,selected);selected=-1;persist();render();draw();}};box.append(btn);}
-function render(){let a=E.stats(city);$('cityName').textContent=city.name;$('mapLabel').textContent=city.name.toUpperCase();$('money').textContent=fmt(city.money);$('population').textContent=a.pop.toLocaleString();$('happy').textContent=a.happiness+'%';$('net').textContent=(a.net>=0?'+':'−')+fmt(Math.abs(a.net));$('income').textContent=fmt(a.income);$('expenses').textContent=fmt(a.expense);$('level').textContent='LEVEL '+world.level+' · '+['','CITY','COUNTRY','CONTINENT'][world.level];$('worldButton').textContent=['','City map','Country map','Continent map'][world.level];let services=$('services');services.replaceChildren();for(let [key,label] of Object.entries({education:'Education',health:'Healthcare',safety:'Safety',power:'Power',water:'Water',transport:'Transit',culture:'Culture'})){let row=document.createElement('div');row.className='service';row.innerHTML=`<div><span>${label}</span><span>${a.capacities[key]} / ${a.pop||0}</span></div><progress max="100" value="${a.coverage(key)*100}"></progress>`;services.append(row);}$('districtBenefits').textContent='Neighborhood tax bonus: '+fmt(a.neighborhoodBonus)+'/min before happiness · '+a.jobs+' local jobs';let next=E.milestones.find(m=>!city.earned.includes(m.id));$('milestoneTitle').textContent=next?next.label:'A city worth celebrating';$('milestoneProgress').max=next?.goal||1;$('milestoneProgress').value=next?Math.min(next.goal,a.pop):1;$('milestoneText').textContent=next?`${a.pop} / ${next.goal} residents · ${fmt(next.reward)} grant at next payment`:'All population milestones achieved. Keep designing!';renderTools();renderSelected();}
-function modal(html){$('modal').classList.remove('worldDialog','cityMenu','coopDialog');$('modal').removeAttribute('aria-labelledby');$('menuButton').setAttribute('aria-expanded','false');$('modalContent').innerHTML=html;if(!$('modal').open)$('modal').showModal();}function newCity(reset=false){if(viewOnly)return;if(!confirm(reset?'Reset the ENTIRE WORLD, including all countries and cities? Export first to keep a backup.':'Start a new WORLD? This replaces all current countries and cities. Export first to keep a backup.'))return;$('newName').value=reset?city.name:'';$('welcome').showModal();}
-$('welcomeForm').onsubmit=ev=>{ev.preventDefault();city=E.fresh($('newName').value);world=G.fresh(city);viewOnly=false;selected=-1;tool=null;persist();$('welcome').close();render();center();toast('Welcome, Mayor. Your first $2,000 is ready.');};
-$('cityName').onclick=()=>{if(viewOnly)return;let name=prompt('Give your city a name:',city.name);if(name?.trim()){if(window.Coop?.active){window.Coop.action('rename',{name:name.trim().slice(0,40)});return;}city.name=name.trim().slice(0,40);persist();render();}};
-$('zoomIn').onclick=()=>zoom(1.2);$('zoomOut').onclick=()=>zoom(1/1.2);$('centerMap').onclick=center;$('inspectTool').onclick=()=>{tool=null;renderTools();draw();};$('closeModal').onclick=()=>$('modal').close();
-$('menuButton').onclick=()=>{
-window.dispatchEvent(new Event('city-menu-opened'));
-modal(`<div class="menuHeading"><div><span class="eyebrow">MAYOR'S DESK</span><h2 id="menuTitle">Game menu</h2></div><button id="menuClose" aria-label="Close game menu">Close</button></div><p class="menuIntro">Your city saves automatically. Export a backup to keep your entire world.</p><div class="menuActions"><button id="export"><b>Export world</b><span>Download all cities and countries as JSON</span></button><button id="import"><b>Import a save</b><span>Open a world or an older city save</span></button><a href="/signin-with-chatgpt?return_to=%2F" target="_top"><b>Sign in to sync</b><span>Send snapshots for the owner's read-only review</span></a><a href="admin.html"><b>Admin dashboard</b><span>Private password required · read only</span></a></div><details class="menuRestart"><summary>Start over</summary><p>These actions replace the whole world. Export a backup first.</p><button id="newCity">Start a new world</button><button id="resetCity" class="danger">Reset world</button></details>`);
-$('modal').classList.add('cityMenu');$('modal').setAttribute('aria-labelledby','menuTitle');$('menuButton').setAttribute('aria-expanded','true');$('menuClose').onclick=()=>$('modal').close();
-$('export').onclick=()=>{const blob=new Blob([JSON.stringify(world,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=(world.level===3?world.continentName:world.level===2?world.countries[0].name:city.name).replace(/[^a-z0-9]/gi,'-')+'-world.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
-$('import').onclick=()=>$('importFile').click();$('newCity').onclick=()=>{if(window.Coop?.active){toast('Leave the shared city before starting a new world.');return;}$('modal').close();newCity();};$('resetCity').onclick=()=>{if(window.Coop?.active){toast('Leave the shared city before resetting your world.');return;}$('modal').close();newCity(true);};if(viewOnly||window.Coop?.active)for(let id of ['import','newCity','resetCity'])$(id).disabled=true;
+"use strict";
+const E = CityEngine,
+  G = WorldEngine,
+  $ = (id) => document.getElementById(id),
+  fmt = (n) => "$" + Math.round(n).toLocaleString();
+let world,
+  city,
+  tool = null,
+  category = "Essentials",
+  selected = -1,
+  hover = -1,
+  viewOnly = false,
+  cloudEnabled = true;
+try {
+  world = G.validate(JSON.parse(localStorage.getItem("littleCity")));
+} catch {
+  world = G.fresh(E.fresh("Your city"));
+}
+city = G.active(world);
+const canvas = $("map"),
+  ctx = canvas.getContext("2d");
+const backgroundMusic = $("backgroundMusic"),
+  musicToggle = $("musicToggle"),
+  musicVolume = $("musicVolume"),
+  musicVolumeValue = $("musicVolumeValue"),
+  musicPreferenceKey = "littleCityMusic";
+let W = 0,
+  H = 0,
+  scale = 1.0,
+  ox = 0,
+  oy = 0,
+  centered = false,
+  pointers = new Map(),
+  gesture = null,
+  drag = null,
+  lastToast = 0;
+const TILE = 58;
+let saveTimer, syncTimer;
+function saveMusicVolume() {
+  try {
+    localStorage.setItem(musicPreferenceKey, musicVolume.value);
+  } catch (error) {
+    console.warn("Could not save the music volume preference.", error);
+  }
+}
+function updateMusicControls() {
+  const playing = !backgroundMusic.paused;
+  musicToggle.setAttribute("aria-pressed", String(playing));
+  musicToggle.setAttribute("aria-label", playing ? "Pause music" : "Play music");
+  musicToggle.dataset.tooltip = playing ? "Pause music" : "Play music";
+  $("musicToggleLabel").textContent = playing ? "Pause" : "Play";
+  musicVolumeValue.textContent =
+    Math.round((Number(musicVolume.value) / Number(musicVolume.max)) * 100) +
+    "%";
+  $("musicPlayIcon").hidden = playing;
+  $("musicPauseIcon").hidden = !playing;
+  $("musicControls").classList.toggle("playing", playing);
+}
+try {
+  const savedVolume = localStorage.getItem(musicPreferenceKey);
+  if (savedVolume !== null) {
+    const volume = Number(savedVolume);
+    if (Number.isFinite(volume) && volume >= 0 && volume <= 0.3)
+      musicVolume.value = String(volume);
+  }
+} catch (error) {
+  console.warn("Could not load the music volume preference.", error);
+}
+backgroundMusic.volume = Number(musicVolume.value);
+musicToggle.addEventListener("click", () => {
+  if (backgroundMusic.paused) {
+    backgroundMusic.play().catch((error) => {
+      console.warn("Could not start background music.", error);
+      toast("Music could not start. Try pressing play again.");
+    });
+  } else backgroundMusic.pause();
+});
+musicVolume.addEventListener("input", () => {
+  backgroundMusic.volume = Number(musicVolume.value);
+  updateMusicControls();
+  saveMusicVolume();
+});
+backgroundMusic.addEventListener("play", updateMusicControls);
+backgroundMusic.addEventListener("playing", updateMusicControls);
+backgroundMusic.addEventListener("pause", updateMusicControls);
+backgroundMusic.addEventListener("ended", updateMusicControls);
+updateMusicControls();
+let placementAudio;
+function getPlacementAudio() {
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContext) return null;
+  try {
+    placementAudio ||= new AudioContext();
+    return placementAudio;
+  } catch (error) {
+    console.warn("Could not create the home placement sound.", error);
+    return null;
+  }
+}
+function prepareHomeAudio() {
+  const context = getPlacementAudio();
+  if (context && context.state !== "running")
+    void context.resume().catch((error) => {
+      console.warn("Could not start the home placement sound.", error);
+    });
+}
+function playHomePop() {
+  const context = getPlacementAudio();
+  if (!context) return;
+  const play = () => {
+    const now = context.currentTime,
+      oscillator = context.createOscillator(),
+      volume = context.createGain();
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(230, now);
+    oscillator.frequency.exponentialRampToValueAtTime(95, now + 0.12);
+    volume.gain.setValueAtTime(0.0001, now);
+    volume.gain.exponentialRampToValueAtTime(0.2, now + 0.008);
+    volume.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
+    oscillator.connect(volume);
+    volume.connect(context.destination);
+    oscillator.start(now);
+    oscillator.stop(now + 0.15);
+  };
+  if (context.state === "running") play();
+  else
+    void context.resume().then(play).catch((error) => {
+      console.warn("Could not start the home placement sound.", error);
+    });
+}
+window.addEventListener("city-home-placed", playHomePop);
+function toast(msg) {
+  if ($("modal").open) {
+    let notice = document.getElementById("modalNotice");
+    if (!notice) {
+      notice = document.createElement("p");
+      notice.id = "modalNotice";
+      notice.setAttribute("role", "status");
+      $("modalContent").prepend(notice);
+    }
+    notice.textContent = msg;
+  }
+  $("toast").textContent = msg;
+  $("toast").classList.add("show");
+  clearTimeout(lastToast);
+  lastToast = setTimeout(() => $("toast").classList.remove("show"), 4500);
+}
+function persist() {
+  if (viewOnly || window.Coop?.active) return;
+  const unlocked = G.progress(world);
+  G.recalculate(world);
+  if (unlocked) toast(unlocked);
+  try {
+    localStorage.setItem("littleCity", JSON.stringify(world));
+    $("saveState").textContent = "Saved on this device";
+  } catch {
+    $("saveState").textContent = "Storage full — export a backup";
+  }
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(sync, 1800);
+}
+async function sync() {
+  if (viewOnly || !cloudEnabled || window.Coop?.active) return;
+  try {
+    const r = await fetch("/api/city", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(world),
+    });
+    if (r.ok)
+      $("saveState").textContent = "Saved on device & synced for mayor review";
+    else if (r.status === 401)
+      $("saveState").textContent = "Local save · sign in to sync";
+  } catch {
+    $("saveState").textContent = "Offline · saved on this device";
+  }
+}
+function rect(c, x, y, w, h, color) {
+  c.fillStyle = color;
+  c.fillRect(x, y, w, h);
+}
+function circle(c, x, y, r, color) {
+  c.fillStyle = color;
+  c.beginPath();
+  c.arc(x, y, r, 0, Math.PI * 2);
+  c.fill();
+}
+function tree(c, x, y, s = 1) {
+  window.CityArt.tree(c, x, y, s);
+}
+function drawBuilding(c, type, level = 1, neigh = {}) {
+  window.CityArt.building(c, type, level, neigh);
+}
+function draw() {
+  ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = "#edf3e8";
+  ctx.fillRect(0, 0, W, H);
+  ctx.save();
+  ctx.translate(ox, oy);
+  ctx.scale(scale, scale);
+  rect(ctx, 0, 0, E.SIZE * TILE, E.SIZE * TILE, "#e4eddc");
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, 0, E.SIZE * TILE, E.SIZE * TILE);
+  ctx.clip();
+  ctx.fillStyle = "#dce8d5";
+  for (let patch = 0; patch < 12; patch++) {
+    ctx.beginPath();
+    ctx.ellipse(
+      (patch * 379 + 120) % (E.SIZE * TILE),
+      (patch * 557 + 100) % (E.SIZE * TILE),
+      210 + (patch % 3) * 40,
+      140 + (patch % 4) * 20,
+      patch * 0.6,
+      0,
+      Math.PI * 2,
+    );
+    ctx.fill();
+  }
+  ctx.restore();
+  let a = Math.max(0, Math.floor(-ox / (TILE * scale)) - 1),
+    b = Math.min(E.SIZE, Math.ceil((W - ox) / (TILE * scale)) + 1),
+    d = Math.max(0, Math.floor(-oy / (TILE * scale)) - 1),
+    e = Math.min(E.SIZE, Math.ceil((H - oy) / (TILE * scale)) + 1);
+  for (let y = d; y < e; y++)
+    for (let x = a; x < b; x++) {
+      let i = y * E.SIZE + x;
+      ctx.save();
+      ctx.translate(x * TILE, y * TILE);
+      if (i % 7 === 0) {
+        ctx.strokeStyle = "#a8bf9e55";
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        ctx.moveTo(12, 43);
+        ctx.lineTo(10, 40);
+        ctx.moveTo(12, 43);
+        ctx.lineTo(13, 39);
+        ctx.moveTo(12, 43);
+        ctx.lineTo(15, 41);
+        ctx.stroke();
+      }
+      if (i % 31 === 0) {
+        circle(ctx, 40, 20, 1.2, "#c7d6b8");
+        circle(ctx, 43, 18, 0.8, "#f4f4d6");
+      }
+      let t = city.tiles[i];
+      if (t)
+        drawBuilding(ctx, t.type, t.level, {
+          left: x > 0 && city.tiles[i - 1]?.type === "road",
+          right: x < 39 && city.tiles[i + 1]?.type === "road",
+          up: y > 0 && city.tiles[i - 40]?.type === "road",
+          down: y < 39 && city.tiles[i + 40]?.type === "road",
+          seed: i,
+        });
+      else if (city.trees[i]) {
+        tree(ctx, 28, 31, 0.85);
+        if (i % 5 === 0) tree(ctx, 44, 46, 0.45);
+      }
+      if (tool) {
+        ctx.strokeStyle = "#b3c6b746";
+        ctx.lineWidth = 0.7 / scale;
+        ctx.strokeRect(0, 0, TILE, TILE);
+      }
+      if (i === selected || i === hover) {
+        rect(ctx, 0, 0, TILE, TILE, i === selected ? "#3277eb28" : "#ffffff35");
+        ctx.strokeStyle = i === selected ? "#3172e2" : "#ffffffbb";
+        ctx.lineWidth = 2 / scale;
+        ctx.strokeRect(1, 1, 56, 56);
+        if (tool && !t && i === hover) {
+          ctx.globalAlpha = 0.6;
+          drawBuilding(ctx, tool, 1);
+        }
+      }
+      ctx.restore();
+    }
+  ctx.strokeStyle = "#d3dfd3";
+  ctx.lineWidth = 3;
+  ctx.strokeRect(0, 0, E.SIZE * TILE, E.SIZE * TILE);
+  ctx.restore();
+}
+function resize() {
+  let r = canvas.getBoundingClientRect();
+  const oldW = W,
+    oldH = H;
+  W = r.width;
+  H = r.height;
+  if (centered) {
+    ox += (W - oldW) / 2;
+    oy += (H - oldH) / 2;
+  }
+  canvas.width = W * devicePixelRatio;
+  canvas.height = H * devicePixelRatio;
+  if (!centered) {
+    center();
+    centered = true;
+  }
+  draw();
+}
+function center() {
+  ox = W / 2 - 20 * TILE * scale;
+  oy = H / 2 - 20 * TILE * scale;
+  draw();
+}
+function zoom(f, x = W / 2, y = H / 2) {
+  let next = Math.max(0.35, Math.min(2.5, scale * f));
+  ox = x - ((x - ox) * next) / scale;
+  oy = y - ((y - oy) * next) / scale;
+  scale = next;
+  $("zoomText").textContent = Math.round(scale * 100) + "%";
+  draw();
+}
+function screenPoint(ev) {
+  let r = canvas.getBoundingClientRect();
+  return { x: ev.clientX - r.left, y: ev.clientY - r.top };
+}
+function tileAt(p) {
+  let x = Math.floor((p.x - ox) / scale / TILE),
+    y = Math.floor((p.y - oy) / scale / TILE);
+  return x >= 0 && y >= 0 && x < E.SIZE && y < E.SIZE ? y * E.SIZE + x : -1;
+}
+function pick(i) {
+  if (i < 0) return;
+  if (tool && !viewOnly && !city.tiles[i]) {
+    if (window.Coop?.active) {
+      if (E.catalog[tool]?.pop) prepareHomeAudio();
+      window.Coop.action("build", { index: i, building: tool });
+      return;
+    }
+    let err = E.build(city, tool, i);
+    if (err) toast(err);
+    else {
+      if (E.catalog[tool]?.pop)
+        window.dispatchEvent(new Event("city-home-placed"));
+      persist();
+      render();
+    }
+    selected = -1;
+  } else {
+    selected = i;
+    if (city.tiles[i]) {
+      tool = null;
+      renderTools();
+    }
+    renderSelected();
+    if (city.tiles[i])
+      window.dispatchEvent(new Event("city-building-selected"));
+  }
+  draw();
+}
+document.addEventListener(
+  "click",
+  (event) => {
+    if (!event.target || typeof event.target.closest !== "function") return;
+    const button = event.target.closest(".game button:not(:disabled)");
+    if (!button) return;
+    button.classList.remove("clickFeedback");
+    void button.offsetWidth;
+    button.classList.add("clickFeedback");
+    setTimeout(() => button.classList.remove("clickFeedback"), 360);
+  },
+  true,
+);
+canvas.addEventListener("pointerdown", (ev) => {
+  canvas.focus({ preventScroll: true });
+  canvas.setPointerCapture(ev.pointerId);
+  let p = screenPoint(ev);
+  pointers.set(ev.pointerId, p);
+  if (pointers.size === 2) {
+    let [a, b] = [...pointers.values()];
+    gesture = { distance: Math.hypot(a.x - b.x, a.y - b.y), scale };
+    drag = null;
+  } else drag = { ...p, ox, oy, moved: false };
+});
+canvas.addEventListener("pointermove", (ev) => {
+  let p = screenPoint(ev);
+  hover = tileAt(p);
+  if (pointers.has(ev.pointerId)) {
+    pointers.set(ev.pointerId, p);
+    if (pointers.size === 2 && gesture) {
+      let [a, b] = [...pointers.values()],
+        distance = Math.hypot(a.x - b.x, a.y - b.y);
+      zoom(
+        (gesture.scale * distance) / gesture.distance / scale,
+        (a.x + b.x) / 2,
+        (a.y + b.y) / 2,
+      );
+    } else if (drag) {
+      if (Math.hypot(p.x - drag.x, p.y - drag.y) > 5) drag.moved = true;
+      if (drag.moved) {
+        ox = drag.ox + p.x - drag.x;
+        oy = drag.oy + p.y - drag.y;
+      }
+    }
+  }
+  draw();
+});
+canvas.addEventListener("pointerup", (ev) => {
+  if (pointers.size === 1 && drag && !drag.moved && !gesture)
+    pick(tileAt(screenPoint(ev)));
+  pointers.delete(ev.pointerId);
+  if (!pointers.size) {
+    drag = null;
+    gesture = null;
+  }
+});
+canvas.addEventListener("pointercancel", () => {
+  pointers.clear();
+  gesture = null;
+  drag = null;
+});
+canvas.addEventListener("pointerleave", () => {
+  hover = -1;
+  draw();
+});
+canvas.addEventListener(
+  "wheel",
+  (ev) => {
+    ev.preventDefault();
+    let p = screenPoint(ev);
+    zoom(ev.deltaY > 0 ? 0.9 : 1.1, p.x, p.y);
+  },
+  { passive: false },
+);
+canvas.addEventListener("keydown", (ev) => {
+  let dirs = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -40, ArrowDown: 40 };
+  if (dirs[ev.key]) {
+    ev.preventDefault();
+    hover = Math.max(
+      0,
+      Math.min(1599, (hover < 0 ? 820 : hover) + dirs[ev.key]),
+    );
+    let x = (hover % 40) * TILE * scale + ox,
+      y = Math.floor(hover / 40) * TILE * scale + oy;
+    if (x < 0 || x > W - 58 * scale) ox = W / 2 - (hover % 40) * TILE * scale;
+    if (y < 0 || y > H - 58 * scale)
+      oy = H / 2 - Math.floor(hover / 40) * TILE * scale;
+    draw();
+  }
+  if (ev.key === "Enter") pick(hover < 0 ? 820 : hover);
+  if (ev.key === "+") zoom(1.2);
+  if (ev.key === "-") zoom(0.8);
+});
+document.addEventListener("keydown", (ev) => {
+  if (ev.key === "Escape") {
+    tool = null;
+    selected = -1;
+    render();
+    draw();
+  }
+});
+function renderTools() {
+  let a = E.stats(city);
+  $("categories").replaceChildren();
+  for (let name of [
+    "Essentials",
+    "Homes",
+    "Business",
+    "Services",
+    "Utilities",
+  ]) {
+    let b = document.createElement("button");
+    b.textContent = name;
+    b.className = name === category ? "active" : "";
+    b.onclick = () => {
+      category = name;
+      renderTools();
+    };
+    $("categories").append(b);
+  }
+  $("buildList").replaceChildren();
+  for (let [key, c] of Object.entries(E.catalog)) {
+    if (c.cat !== category) continue;
+    let b = document.createElement("button");
+    b.className = "buildCard" + (tool === key ? " active" : "");
+    let icon = document.createElement("canvas");
+    icon.width = 116;
+    icon.height = 116;
+    const iconContext = icon.getContext("2d");
+    iconContext.scale(2, 2);
+    drawBuilding(iconContext, key);
+    b.append(icon);
+    let text = document.createElement("span");
+    text.innerHTML = `<b>${c.name}</b><small>${c.unlock > a.level ? "City pop " + (c.unlock === 2 ? 32 : 100) + " unlock" : c.pop ? "+" + c.pop + " residents" : c.income ? "+" + fmt(c.income) + "/min" : c.expense ? fmt(c.expense) + "/min upkeep" : "Connect your city"}</small>`;
+    b.append(text);
+    let price = document.createElement("span");
+    price.className = "price";
+    price.textContent = fmt(c.cost);
+    b.append(price);
+    b.disabled = viewOnly || (c.unlock || 1) > a.level;
+    b.title = c.purpose;
+    b.onclick = () => {
+      tool = tool === key ? null : key;
+      selected = -1;
+      $("tipText").textContent = c.purpose;
+      renderTools();
+      renderSelected();
+      draw();
+    };
+    $("buildList").append(b);
+  }
+  $("toolLabel").textContent = viewOnly
+    ? "Read-only city visit"
+    : tool
+      ? "Building " + E.catalog[tool].name
+      : "Explore mode";
+}
+function renderSelected() {
+  let box = $("selected");
+  box.replaceChildren();
+  let b = city.tiles[selected];
+  if (!b) return;
+  let c = E.catalog[b.type],
+    a = E.stats(city),
+    title = document.createElement("h3");
+  title.textContent = c.name + " · Level " + b.level;
+  box.append(title);
+  let p = document.createElement("p");
+  p.textContent = c.purpose;
+  box.append(p);
+  const neighborhood = E.neighborhood(city, selected);
+  if (neighborhood.reason) {
+    let note = document.createElement("p");
+    note.className = "neighborhoodNote";
+    note.textContent = neighborhood.reason;
+    box.append(note);
+  }
+  let details = document.createElement("p");
+  details.textContent =
+    (c.pop ? `${c.pop * b.level} residents. ` : "") +
+    (c.capacity ? `Capacity: ${c.capacity * b.level}. ` : "") +
+    (c.income ? `Base income ${fmt(c.income * b.level)}/min. ` : "") +
+    (c.expense ? `Upkeep ${fmt(c.expense * b.level)}/min. ` : "") +
+    (b.type !== "road" && !E.adjacent(city, selected)
+      ? "No adjacent road: tax income halved."
+      : "");
+  box.append(details);
+  if (viewOnly) return;
+  let max = b.type === "road" ? 2 : 3;
+  if (b.level < max) {
+    let btn = document.createElement("button");
+    btn.className = "primary wide";
+    btn.textContent = `Upgrade · ${fmt(E.upgradeCost(b))}`;
+    btn.title =
+      b.type === "road"
+        ? "Improved road: +0.3 happiness"
+        : `Next level: ${(c.pop || c.capacity || c.income || 4) * (b.level + 1)} ${c.pop ? "residents" : c.capacity ? "capacity" : c.income ? "base income/min" : "park happiness points"}. Maintenance scales with level.`;
+    btn.onclick = () => {
+      if (window.Coop?.active) {
+        window.Coop.action("upgrade", {
+          index: selected,
+          expected: { ...city.tiles[selected] },
+        });
+        return;
+      }
+      let err = E.upgrade(city, selected);
+      if (err) toast(err);
+      else {
+        persist();
+        render();
+        draw();
+      }
+    };
+    box.append(btn);
+    let benefit = document.createElement("small");
+    benefit.textContent =
+      b.type === "road"
+        ? "Smoother streets · +0.3 happiness"
+        : `Next level: ${c.pop ? c.pop * (b.level + 1) + " residents" : c.capacity ? c.capacity * (b.level + 1) + " service capacity" : c.income ? fmt(c.income * (b.level + 1)) + "/min base tax" : "more happiness"}${c.expense ? " · " + fmt(c.expense * (b.level + 1)) + "/min upkeep" : ""}`;
+    box.append(benefit);
+  }
+  let btn = document.createElement("button");
+  btn.className = "wide danger";
+  btn.textContent = "Demolish · 40% base cost refund";
+  btn.onclick = () => {
+    if (
+      confirm(
+        `Remove this ${c.name.toLowerCase()}? You will receive ${fmt(Math.floor(c.cost * 0.4 * b.level))}.`,
+      )
+    ) {
+      if (window.Coop?.active) {
+        window.Coop.action("demolish", {
+          index: selected,
+          expected: { ...city.tiles[selected] },
+        });
+        return;
+      }
+      E.demolish(city, selected);
+      selected = -1;
+      persist();
+      render();
+      draw();
+    }
+  };
+  box.append(btn);
+}
+function render() {
+  let a = E.stats(city);
+  $("cityName").textContent = city.name;
+  $("mapLabel").textContent = city.name.toUpperCase();
+  $("money").textContent = fmt(city.money);
+  $("population").textContent = a.pop.toLocaleString();
+  $("happy").textContent = a.happiness + "%";
+  $("net").textContent = (a.net >= 0 ? "+" : "−") + fmt(Math.abs(a.net));
+  $("income").textContent = fmt(a.income);
+  $("expenses").textContent = fmt(a.expense);
+  $("level").textContent =
+    "LEVEL " +
+    world.level +
+    " · " +
+    ["", "CITY", "COUNTRY", "CONTINENT"][world.level];
+  $("worldButton").textContent = [
+    "",
+    "City map",
+    "Country map",
+    "Continent map",
+  ][world.level];
+  let services = $("services");
+  services.replaceChildren();
+  for (let [key, label] of Object.entries({
+    education: "Education",
+    health: "Healthcare",
+    safety: "Safety",
+    power: "Power",
+    water: "Water",
+    transport: "Transit",
+    culture: "Culture",
+  })) {
+    let row = document.createElement("div");
+    row.className = "service";
+    row.innerHTML = `<div><span>${label}</span><span>${a.capacities[key]} / ${a.pop || 0}</span></div><progress max="100" value="${a.coverage(key) * 100}"></progress>`;
+    services.append(row);
+  }
+  $("districtBenefits").textContent =
+    "Neighborhood tax bonus: " +
+    fmt(a.neighborhoodBonus) +
+    "/min before happiness · " +
+    a.jobs +
+    " local jobs";
+  let next = E.milestones.find((m) => !city.earned.includes(m.id));
+  $("milestoneTitle").textContent = next
+    ? next.label
+    : "A city worth celebrating";
+  $("milestoneProgress").max = next?.goal || 1;
+  $("milestoneProgress").value = next ? Math.min(next.goal, a.pop) : 1;
+  $("milestoneText").textContent = next
+    ? `${a.pop} / ${next.goal} residents · ${fmt(next.reward)} grant at next payment`
+    : "All population milestones achieved. Keep designing!";
+  renderTools();
+  renderSelected();
+}
+function modal(html) {
+  $("modal").classList.remove("worldDialog", "cityMenu", "coopDialog");
+  $("modal").removeAttribute("aria-labelledby");
+  $("menuButton").setAttribute("aria-expanded", "false");
+  $("modalContent").innerHTML = html;
+  if (!$("modal").open) $("modal").showModal();
+}
+function newCity(reset = false) {
+  if (viewOnly) return;
+  if (
+    !confirm(
+      reset
+        ? "Reset the ENTIRE WORLD, including all countries and cities? Export first to keep a backup."
+        : "Start a new WORLD? This replaces all current countries and cities. Export first to keep a backup.",
+    )
+  )
+    return;
+  $("newName").value = reset ? city.name : "";
+  $("welcome").showModal();
+}
+$("welcomeForm").onsubmit = (ev) => {
+  ev.preventDefault();
+  city = E.fresh($("newName").value);
+  world = G.fresh(city);
+  viewOnly = false;
+  selected = -1;
+  tool = null;
+  persist();
+  $("welcome").close();
+  render();
+  center();
+  toast("Welcome, Mayor. Your first $2,000 is ready.");
 };
-$('modal').addEventListener('close',()=>{$('menuButton').setAttribute('aria-expanded','false');$('modal').classList.remove('cityMenu');});
-$('modal').addEventListener('click',event=>{if(event.target!==$('modal'))return;const r=$('modal').getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)$('modal').close();});
-$('importFile').onchange=async ev=>{let file=ev.target.files[0];if(!file)return;try{if(file.size>4000000)throw Error('This file is too large.');let next=G.validate(JSON.parse(await file.text()));if(!confirm('Replace your entire world with this save? Export first to keep it.'))return;world=next;city=G.active(world);selected=-1;tool=null;persist();render();draw();$('modal').close();toast('World imported. All cities are ready.');}catch(err){toast(err.message);}ev.target.value='';};
-$('achievements').onclick=()=>{modal('<span class="eyebrow">CITY JOURNAL</span><h2>Small steps. Big city.</h2><div id="journal"></div><p>Management level 2: 32 total residents unlock your country. Level 3: 3 cities and 120 total residents unlock your continent. Building unlocks still follow each city’s own population: 32 and 100. Connect buildings to roads for full taxes, and balance services with growth.</p>');for(let m of E.milestones){let row=document.createElement('div');row.className='journalRow';row.textContent=(city.earned.includes(m.id)?'Achieved · ':'In progress · ')+m.label+' — '+m.goal+' residents, '+fmt(m.reward);$('journal').append(row);}};
-setInterval(()=>{if(!viewOnly&&!window.Coop?.active){let due=G.cities(world).some(c=>Date.now()>=c.nextPayment);let messages=due?G.tick(world):[];if(due){persist();render();if(messages.length)toast(messages.join(' '));else toast('City payment received. Keep growing!');}}let seconds=Math.max(0,Math.ceil((city.nextPayment-Date.now())/1000));$('countdown').textContent=viewOnly?'Paused':Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0');$('timer').value=60-seconds;},500);
-window.addEventListener('beforeunload',()=>{if(!viewOnly&&!window.Coop?.active)try{localStorage.setItem('littleCity',JSON.stringify(world));}catch{}});new ResizeObserver(resize).observe($('mapArea'));render();
-(async()=>{let visit=new URLSearchParams(location.search).get('visit');if(visit){viewOnly=true;cloudEnabled=false;tool=null;try{let r=await fetch('/api/admin/cities/'+encodeURIComponent(visit));if(!r.ok)throw Error('Admin sign-in required to visit this city.');world=G.validate(await r.json());city=G.active(world);render();draw();toast('Read-only visit. This city cannot be edited.');}catch(e){modal('<h2>Visit unavailable</h2><p></p>');$('modalContent').querySelector('p').textContent=e.message;}return;}if(!localStorage.getItem('littleCity'))$('welcome').showModal();else{let notices=G.tick(world);persist();render();if(notices.length)toast(notices.join(' '));}})();
+$("cityName").onclick = () => {
+  if (viewOnly) return;
+  let name = prompt("Give your city a name:", city.name);
+  if (name?.trim()) {
+    if (window.Coop?.active) {
+      window.Coop.action("rename", { name: name.trim().slice(0, 40) });
+      return;
+    }
+    city.name = name.trim().slice(0, 40);
+    persist();
+    render();
+  }
+};
+$("zoomIn").onclick = () => zoom(1.2);
+$("zoomOut").onclick = () => zoom(1 / 1.2);
+$("centerMap").onclick = center;
+$("inspectTool").onclick = () => {
+  tool = null;
+  renderTools();
+  draw();
+};
+$("closeModal").onclick = () => $("modal").close();
+$("menuButton").onclick = () => {
+  window.dispatchEvent(new Event("city-menu-opened"));
+  modal(
+    `<div class="menuHeading"><div><span class="eyebrow">MAYOR'S DESK</span><h2 id="menuTitle">Game menu</h2></div><button id="menuClose" aria-label="Close game menu">Close</button></div><p class="menuIntro">Your city saves automatically. Export a backup to keep your entire world.</p><div class="menuActions"><button id="export"><b>Export world</b><span>Download all cities and countries as JSON</span></button><button id="import"><b>Import a save</b><span>Open a world or an older city save</span></button><a href="/signin-with-chatgpt?return_to=%2F" target="_top"><b>Sign in to sync</b><span>Send snapshots for the owner's read-only review</span></a><a href="admin.html"><b>Admin dashboard</b><span>Private password required · read only</span></a></div><details class="menuRestart"><summary>Start over</summary><p>These actions replace the whole world. Export a backup first.</p><button id="newCity">Start a new world</button><button id="resetCity" class="danger">Reset world</button></details>`,
+  );
+  $("modal").classList.add("cityMenu");
+  $("modal").setAttribute("aria-labelledby", "menuTitle");
+  $("menuButton").setAttribute("aria-expanded", "true");
+  $("menuClose").onclick = () => $("modal").close();
+  $("export").onclick = () => {
+    const blob = new Blob([JSON.stringify(world, null, 2)], {
+        type: "application/json",
+      }),
+      url = URL.createObjectURL(blob),
+      a = document.createElement("a");
+    a.href = url;
+    a.download =
+      (world.level === 3
+        ? world.continentName
+        : world.level === 2
+          ? world.countries[0].name
+          : city.name
+      ).replace(/[^a-z0-9]/gi, "-") + "-world.json";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+  $("import").onclick = () => $("importFile").click();
+  $("newCity").onclick = () => {
+    if (window.Coop?.active) {
+      toast("Leave the shared city before starting a new world.");
+      return;
+    }
+    $("modal").close();
+    newCity();
+  };
+  $("resetCity").onclick = () => {
+    if (window.Coop?.active) {
+      toast("Leave the shared city before resetting your world.");
+      return;
+    }
+    $("modal").close();
+    newCity(true);
+  };
+  if (viewOnly || window.Coop?.active)
+    for (let id of ["import", "newCity", "resetCity"]) $(id).disabled = true;
+};
+$("modal").addEventListener("close", () => {
+  $("menuButton").setAttribute("aria-expanded", "false");
+  $("modal").classList.remove("cityMenu");
+});
+$("modal").addEventListener("click", (event) => {
+  if (event.target !== $("modal")) return;
+  const r = $("modal").getBoundingClientRect();
+  if (
+    event.clientX < r.left ||
+    event.clientX > r.right ||
+    event.clientY < r.top ||
+    event.clientY > r.bottom
+  )
+    $("modal").close();
+});
+$("importFile").onchange = async (ev) => {
+  let file = ev.target.files[0];
+  if (!file) return;
+  try {
+    if (file.size > 4000000) throw Error("This file is too large.");
+    let next = G.validate(JSON.parse(await file.text()));
+    if (
+      !confirm(
+        "Replace your entire world with this save? Export first to keep it.",
+      )
+    )
+      return;
+    world = next;
+    city = G.active(world);
+    selected = -1;
+    tool = null;
+    persist();
+    render();
+    draw();
+    $("modal").close();
+    toast("World imported. All cities are ready.");
+  } catch (err) {
+    toast(err.message);
+  }
+  ev.target.value = "";
+};
+$("achievements").onclick = () => {
+  modal(
+    '<span class="eyebrow">CITY JOURNAL</span><h2>Small steps. Big city.</h2><div id="journal"></div><p>Management level 2: 32 total residents unlock your country. Level 3: 3 cities and 120 total residents unlock your continent. Building unlocks still follow each city’s own population: 32 and 100. Connect buildings to roads for full taxes, and balance services with growth.</p>',
+  );
+  for (let m of E.milestones) {
+    let row = document.createElement("div");
+    row.className = "journalRow";
+    row.textContent =
+      (city.earned.includes(m.id) ? "Achieved · " : "In progress · ") +
+      m.label +
+      " — " +
+      m.goal +
+      " residents, " +
+      fmt(m.reward);
+    $("journal").append(row);
+  }
+};
+setInterval(() => {
+  if (!viewOnly && !window.Coop?.active) {
+    let due = G.cities(world).some((c) => Date.now() >= c.nextPayment);
+    let messages = due ? G.tick(world) : [];
+    if (due) {
+      persist();
+      render();
+      if (messages.length) toast(messages.join(" "));
+      else toast("City payment received. Keep growing!");
+    }
+  }
+  let seconds = Math.max(0, Math.ceil((city.nextPayment - Date.now()) / 1000));
+  $("countdown").textContent = viewOnly
+    ? "Paused"
+    : Math.floor(seconds / 60) + ":" + String(seconds % 60).padStart(2, "0");
+  $("timer").value = 60 - seconds;
+}, 500);
+window.addEventListener("beforeunload", () => {
+  if (!viewOnly && !window.Coop?.active)
+    try {
+      localStorage.setItem("littleCity", JSON.stringify(world));
+    } catch {}
+});
+new ResizeObserver(resize).observe($("mapArea"));
+render();
+(async () => {
+  let visit = new URLSearchParams(location.search).get("visit");
+  if (visit) {
+    viewOnly = true;
+    cloudEnabled = false;
+    tool = null;
+    try {
+      let r = await fetch("/api/admin/cities/" + encodeURIComponent(visit));
+      if (!r.ok) throw Error("Admin sign-in required to visit this city.");
+      world = G.validate(await r.json());
+      city = G.active(world);
+      render();
+      draw();
+      toast("Read-only visit. This city cannot be edited.");
+    } catch (e) {
+      modal("<h2>Visit unavailable</h2><p></p>");
+      $("modalContent").querySelector("p").textContent = e.message;
+    }
+    return;
+  }
+  if (!localStorage.getItem("littleCity")) $("welcome").showModal();
+  else {
+    let notices = G.tick(world);
+    persist();
+    render();
+    if (notices.length) toast(notices.join(" "));
+  }
+})();
 
 // World management: changing the viewed city never resets its simulation.
-function switchCity(id){const target=G.cities(world).find(c=>c.id===id);if(!target)return;world.activeCityId=id;city=target;selected=-1;hover=-1;tool=null;if(!viewOnly)persist();$('modal').close();window.dispatchEvent(new Event('city-map-opened'));render();center();toast(viewOnly?'Read-only visit · '+city.name:'Welcome to '+city.name);}
-function worldMap(){if(window.Coop?.active){window.Coop.open();return;}const total=G.summary(world),tier=world.level;
-modal(`<span class="eyebrow">LEVEL ${tier} · ${['','CITY MAYOR','COUNTRY LEADER','CONTINENT LEADER'][tier]}</span><h2 id="worldTitle"></h2><p id="worldSummary"></p><div id="worldPromotion" class="worldPromotion"></div><div id="worldNames" class="worldNames"></div><div id="worldAtlas" class="worldAtlas"></div><div id="countryList" class="countryList"></div><div id="worldForms"></div><p class="muted">Every city has its own treasury, service coverage and 60-second payment timer. All your cities keep earning while you explore. Intercity roads add $15 per minute to each connected city.</p>`);
-$('modal').classList.add('worldDialog');$('worldTitle').textContent=tier===3?world.continentName:tier===2?world.countries[0].name:city.name;
-$('worldSummary').textContent=`${total.cities} ${total.cities===1?'city':'cities'} · ${total.countries} ${total.countries===1?'country':'countries'} · ${total.population.toLocaleString()} residents · ${fmt(total.money)} across all treasuries`;
-$('worldPromotion').textContent=tier===1?`Country unlock: ${total.population} / 32 residents. Your original city becomes your capital.`:tier===2?`Continent unlock: ${total.cities} / 3 cities and ${total.population} / 120 residents.`:'Continent unlocked. Build up to 8 countries and 24 cities in this world.';
-if(!viewOnly&&tier===3){let rename=document.createElement('button');rename.textContent='Rename continent';rename.onclick=()=>{let n=prompt('Continent name:',world.continentName);if(n?.trim()){world.continentName=n.trim().slice(0,40);persist();worldMap();}};$('worldNames').append(rename);}
-const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg'),height=Math.max(290,Math.ceil(world.countries.length/2)*260);svg.setAttribute('viewBox',`0 0 900 ${height}`);svg.setAttribute('role','img');svg.setAttribute('aria-label','World map. Cities are connected by blue trade routes.');const positions=new Map();
-const shape=(tag,attrs,text)=>{let el=document.createElementNS(ns,tag);for(let [k,v]of Object.entries(attrs))el.setAttribute(k,String(v));if(text!==undefined)el.textContent=text;svg.append(el);return el;};
-for(let [i,country]of world.countries.entries()){const single=world.countries.length===1,cx=single?450:(i%2)*440+230,cy=Math.floor(i/2)*260+140,rx=single?360:198;shape('path',{d:`M ${cx-rx} ${cy-30} Q ${cx-rx+30} ${cy-115} ${cx-40} ${cy-99} Q ${cx+rx-20} ${cy-125} ${cx+rx} ${cy-20} Q ${cx+rx+25} ${cy+80} ${cx+40} ${cy+99} Q ${cx-rx-20} ${cy+110} ${cx-rx} ${cy-30}`,fill:i%2?'#e3ebce':'#dce8d0',stroke:'#c6d6b5','stroke-width':2});shape('text',{x:cx,y:cy-70,'text-anchor':'middle',fill:'#72906a','font-size':13,'font-family':'system-ui','font-weight':600},tier===1?'Your first city':country.name.slice(0,32));
-country.cities.forEach((c,j)=>{let columns=single?4:3,spacing=single?150:110,x=cx+(j%columns-(Math.min(country.cities.length,columns)-1)/2)*spacing,y=cy-15+Math.floor(j/columns)*40;positions.set(c.id,{x,y});});}
-for(let l of world.connections){let a=positions.get(l.a),b=positions.get(l.b);if(a&&b)shape('path',{d:`M ${a.x} ${a.y} Q ${(a.x+b.x)/2} ${(a.y+b.y)/2-25} ${b.x} ${b.y}`,stroke:'#8caed0','stroke-width':3,fill:'none','stroke-dasharray':'6 4'});}
-for(let c of G.cities(world)){let p=positions.get(c.id),g=document.createElementNS(ns,'g');g.setAttribute('role','button');g.setAttribute('tabindex','0');g.setAttribute('aria-label','Visit '+c.name);const dot=document.createElementNS(ns,'circle');for(let [k,v]of Object.entries({cx:p.x,cy:p.y,r:c.id===city.id?9:6,fill:c.id===city.id?'#2563eb':'#5a85a5',stroke:'#fff','stroke-width':3}))dot.setAttribute(k,String(v));g.append(dot);let text=document.createElementNS(ns,'text');for(let [k,v]of Object.entries({x:p.x,y:p.y+20,'text-anchor':'middle',fill:'#40566b','font-size':11,'font-family':'system-ui'}))text.setAttribute(k,String(v));text.textContent=c.name.length>17?c.name.slice(0,16)+'…':c.name;g.append(text);g.onclick=()=>switchCity(c.id);g.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();switchCity(c.id);}};svg.append(g);}$('worldAtlas').append(svg);
-for(let country of world.countries){let card=document.createElement('section');card.className='countryCard';let heading=document.createElement('h3');heading.textContent=tier===1?'Your city':country.name;card.append(heading);if(tier>=2&&!viewOnly){let rename=document.createElement('button');rename.className='renameCountry';rename.textContent='Rename country';rename.onclick=()=>{let n=prompt('Country name:',country.name);if(n?.trim()){country.name=n.trim().slice(0,40);persist();worldMap();}};card.append(rename);}for(let c of country.cities){let a=E.stats(c),btn=document.createElement('button');btn.className='worldCity'+(c.id===city.id?' current':'');let title=document.createElement('b');title.textContent=c.name+(c.id===city.id?' · current':'');let info=document.createElement('small');info.textContent=`${a.pop} residents · ${fmt(c.money)} · ${a.happiness}% happy · +${fmt(c.tradeIncome||0)}/min trade`;btn.append(title,info);btn.onclick=()=>switchCity(c.id);card.append(btn);}$('countryList').append(card);}
-if(viewOnly)return;
-if(tier>=2){const section=document.createElement('section');section.className='worldActions';section.innerHTML='<h3>Found a city</h3><form id="foundCityForm"><label>Country<select id="cityCountry" required></select></label><label>City name<input id="foundCityName" maxlength="40" required placeholder="New city name"></label><button class="primary">Found city · $2,000 starter grant</button></form>';$('worldForms').append(section);for(let c of world.countries){let option=document.createElement('option');option.value=c.id;option.textContent=c.name;$('cityCountry').append(option);}$('cityCountry').value=world.countries.find(c=>c.cities.some(s=>s.id===city.id)).id;$('foundCityForm').onsubmit=e=>{e.preventDefault();try{city=G.addCity(world,$('cityCountry').value,$('foundCityName').value);selected=-1;tool=null;persist();render();center();worldMap();toast('New city founded. Its $2,000 starter grant is ready.');}catch(err){toast(err.message);}};
-if(total.cities>=2){let section=document.createElement('section');section.className='worldActions';section.innerHTML='<h3>Connect your cities</h3><form id="connectForm"><label>From<select id="roadFrom"></select></label><label>To<select id="roadTo"></select></label><button>Build intercity road · $150</button></form><p>Paid from the starting city. Each endpoint earns +$15/min. A pair can only be connected once.</p>';$('worldForms').append(section);for(let c of G.cities(world))for(let id of ['roadFrom','roadTo']){let option=document.createElement('option');option.value=c.id;option.textContent=c.name;$(id).append(option);}$('roadFrom').value=city.id;$('roadTo').value=G.cities(world).find(c=>c.id!==city.id).id;$('connectForm').onsubmit=e=>{e.preventDefault();try{G.connect(world,$('roadFrom').value,$('roadTo').value);persist();render();worldMap();toast('Trade route open. Both cities earn +$15 each minute.');}catch(err){toast(err.message);}};}}
-if(tier===3){let section=document.createElement('section');section.className='worldActions';section.innerHTML='<h3>Establish a country</h3><form id="foundCountryForm"><label>Country name<input id="foundCountryName" maxlength="40" required placeholder="New country"></label><label>First city<input id="countryCapital" maxlength="40" required placeholder="Capital city"></label><button class="primary">Create country & capital</button></form>';$('worldForms').append(section);$('foundCountryForm').onsubmit=e=>{e.preventDefault();try{G.addCountry(world,$('foundCountryName').value,$('countryCapital').value);city=G.active(world);selected=-1;tool=null;persist();render();center();worldMap();toast('Country established. Your continent is growing.');}catch(err){toast(err.message);}};}}
-$('worldButton').onclick=worldMap;
+function switchCity(id) {
+  const target = G.cities(world).find((c) => c.id === id);
+  if (!target) return;
+  world.activeCityId = id;
+  city = target;
+  selected = -1;
+  hover = -1;
+  tool = null;
+  if (!viewOnly) persist();
+  $("modal").close();
+  window.dispatchEvent(new Event("city-map-opened"));
+  render();
+  center();
+  toast(
+    viewOnly ? "Read-only visit · " + city.name : "Welcome to " + city.name,
+  );
+}
+function worldMap() {
+  if (window.Coop?.active) {
+    window.Coop.open();
+    return;
+  }
+  const total = G.summary(world),
+    tier = world.level;
+  modal(
+    `<span class="eyebrow">LEVEL ${tier} · ${["", "CITY MAYOR", "COUNTRY LEADER", "CONTINENT LEADER"][tier]}</span><h2 id="worldTitle"></h2><p id="worldSummary"></p><div id="worldPromotion" class="worldPromotion"></div><div id="worldNames" class="worldNames"></div><div id="worldAtlas" class="worldAtlas"></div><div id="countryList" class="countryList"></div><div id="worldForms"></div><p class="muted">Every city has its own treasury, service coverage and 60-second payment timer. All your cities keep earning while you explore. Intercity roads add $15 per minute to each connected city.</p>`,
+  );
+  $("modal").classList.add("worldDialog");
+  $("worldTitle").textContent =
+    tier === 3
+      ? world.continentName
+      : tier === 2
+        ? world.countries[0].name
+        : city.name;
+  $("worldSummary").textContent =
+    `${total.cities} ${total.cities === 1 ? "city" : "cities"} · ${total.countries} ${total.countries === 1 ? "country" : "countries"} · ${total.population.toLocaleString()} residents · ${fmt(total.money)} across all treasuries`;
+  $("worldPromotion").textContent =
+    tier === 1
+      ? `Country unlock: ${total.population} / 32 residents. Your original city becomes your capital.`
+      : tier === 2
+        ? `Continent unlock: ${total.cities} / 3 cities and ${total.population} / 120 residents.`
+        : "Continent unlocked. Build up to 8 countries and 24 cities in this world.";
+  if (!viewOnly && tier === 3) {
+    let rename = document.createElement("button");
+    rename.textContent = "Rename continent";
+    rename.onclick = () => {
+      let n = prompt("Continent name:", world.continentName);
+      if (n?.trim()) {
+        world.continentName = n.trim().slice(0, 40);
+        persist();
+        worldMap();
+      }
+    };
+    $("worldNames").append(rename);
+  }
+  const ns = "http://www.w3.org/2000/svg",
+    svg = document.createElementNS(ns, "svg"),
+    height = Math.max(290, Math.ceil(world.countries.length / 2) * 260);
+  svg.setAttribute("viewBox", `0 0 900 ${height}`);
+  svg.setAttribute("role", "img");
+  svg.setAttribute(
+    "aria-label",
+    "World map. Cities are connected by blue trade routes.",
+  );
+  const positions = new Map();
+  const shape = (tag, attrs, text) => {
+    let el = document.createElementNS(ns, tag);
+    for (let [k, v] of Object.entries(attrs)) el.setAttribute(k, String(v));
+    if (text !== undefined) el.textContent = text;
+    svg.append(el);
+    return el;
+  };
+  for (let [i, country] of world.countries.entries()) {
+    const single = world.countries.length === 1,
+      cx = single ? 450 : (i % 2) * 440 + 230,
+      cy = Math.floor(i / 2) * 260 + 140,
+      rx = single ? 360 : 198;
+    shape("path", {
+      d: `M ${cx - rx} ${cy - 30} Q ${cx - rx + 30} ${cy - 115} ${cx - 40} ${cy - 99} Q ${cx + rx - 20} ${cy - 125} ${cx + rx} ${cy - 20} Q ${cx + rx + 25} ${cy + 80} ${cx + 40} ${cy + 99} Q ${cx - rx - 20} ${cy + 110} ${cx - rx} ${cy - 30}`,
+      fill: i % 2 ? "#e3ebce" : "#dce8d0",
+      stroke: "#c6d6b5",
+      "stroke-width": 2,
+    });
+    shape(
+      "text",
+      {
+        x: cx,
+        y: cy - 70,
+        "text-anchor": "middle",
+        fill: "#72906a",
+        "font-size": 13,
+        "font-family": "system-ui",
+        "font-weight": 600,
+      },
+      tier === 1 ? "Your first city" : country.name.slice(0, 32),
+    );
+    country.cities.forEach((c, j) => {
+      let columns = single ? 4 : 3,
+        spacing = single ? 150 : 110,
+        x =
+          cx +
+          ((j % columns) - (Math.min(country.cities.length, columns) - 1) / 2) *
+            spacing,
+        y = cy - 15 + Math.floor(j / columns) * 40;
+      positions.set(c.id, { x, y });
+    });
+  }
+  for (let l of world.connections) {
+    let a = positions.get(l.a),
+      b = positions.get(l.b);
+    if (a && b)
+      shape("path", {
+        d: `M ${a.x} ${a.y} Q ${(a.x + b.x) / 2} ${(a.y + b.y) / 2 - 25} ${b.x} ${b.y}`,
+        stroke: "#8caed0",
+        "stroke-width": 3,
+        fill: "none",
+        "stroke-dasharray": "6 4",
+      });
+  }
+  for (let c of G.cities(world)) {
+    let p = positions.get(c.id),
+      g = document.createElementNS(ns, "g");
+    g.setAttribute("role", "button");
+    g.setAttribute("tabindex", "0");
+    g.setAttribute("aria-label", "Visit " + c.name);
+    const dot = document.createElementNS(ns, "circle");
+    for (let [k, v] of Object.entries({
+      cx: p.x,
+      cy: p.y,
+      r: c.id === city.id ? 9 : 6,
+      fill: c.id === city.id ? "#2563eb" : "#5a85a5",
+      stroke: "#fff",
+      "stroke-width": 3,
+    }))
+      dot.setAttribute(k, String(v));
+    g.append(dot);
+    let text = document.createElementNS(ns, "text");
+    for (let [k, v] of Object.entries({
+      x: p.x,
+      y: p.y + 20,
+      "text-anchor": "middle",
+      fill: "#40566b",
+      "font-size": 11,
+      "font-family": "system-ui",
+    }))
+      text.setAttribute(k, String(v));
+    text.textContent = c.name.length > 17 ? c.name.slice(0, 16) + "…" : c.name;
+    g.append(text);
+    g.onclick = () => switchCity(c.id);
+    g.onkeydown = (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        switchCity(c.id);
+      }
+    };
+    svg.append(g);
+  }
+  $("worldAtlas").append(svg);
+  for (let country of world.countries) {
+    let card = document.createElement("section");
+    card.className = "countryCard";
+    let heading = document.createElement("h3");
+    heading.textContent = tier === 1 ? "Your city" : country.name;
+    card.append(heading);
+    if (tier >= 2 && !viewOnly) {
+      let rename = document.createElement("button");
+      rename.className = "renameCountry";
+      rename.textContent = "Rename country";
+      rename.onclick = () => {
+        let n = prompt("Country name:", country.name);
+        if (n?.trim()) {
+          country.name = n.trim().slice(0, 40);
+          persist();
+          worldMap();
+        }
+      };
+      card.append(rename);
+    }
+    for (let c of country.cities) {
+      let a = E.stats(c),
+        btn = document.createElement("button");
+      btn.className = "worldCity" + (c.id === city.id ? " current" : "");
+      let title = document.createElement("b");
+      title.textContent = c.name + (c.id === city.id ? " · current" : "");
+      let info = document.createElement("small");
+      info.textContent = `${a.pop} residents · ${fmt(c.money)} · ${a.happiness}% happy · +${fmt(c.tradeIncome || 0)}/min trade`;
+      btn.append(title, info);
+      btn.onclick = () => switchCity(c.id);
+      card.append(btn);
+    }
+    $("countryList").append(card);
+  }
+  if (viewOnly) return;
+  if (tier >= 2) {
+    const section = document.createElement("section");
+    section.className = "worldActions";
+    section.innerHTML =
+      '<h3>Found a city</h3><form id="foundCityForm"><label>Country<select id="cityCountry" required></select></label><label>City name<input id="foundCityName" maxlength="40" required placeholder="New city name"></label><button class="primary">Found city · $2,000 starter grant</button></form>';
+    $("worldForms").append(section);
+    for (let c of world.countries) {
+      let option = document.createElement("option");
+      option.value = c.id;
+      option.textContent = c.name;
+      $("cityCountry").append(option);
+    }
+    $("cityCountry").value = world.countries.find((c) =>
+      c.cities.some((s) => s.id === city.id),
+    ).id;
+    $("foundCityForm").onsubmit = (e) => {
+      e.preventDefault();
+      try {
+        city = G.addCity(
+          world,
+          $("cityCountry").value,
+          $("foundCityName").value,
+        );
+        selected = -1;
+        tool = null;
+        persist();
+        render();
+        center();
+        worldMap();
+        toast("New city founded. Its $2,000 starter grant is ready.");
+      } catch (err) {
+        toast(err.message);
+      }
+    };
+    if (total.cities >= 2) {
+      let section = document.createElement("section");
+      section.className = "worldActions";
+      section.innerHTML =
+        '<h3>Connect your cities</h3><form id="connectForm"><label>From<select id="roadFrom"></select></label><label>To<select id="roadTo"></select></label><button>Build intercity road · $150</button></form><p>Paid from the starting city. Each endpoint earns +$15/min. A pair can only be connected once.</p>';
+      $("worldForms").append(section);
+      for (let c of G.cities(world))
+        for (let id of ["roadFrom", "roadTo"]) {
+          let option = document.createElement("option");
+          option.value = c.id;
+          option.textContent = c.name;
+          $(id).append(option);
+        }
+      $("roadFrom").value = city.id;
+      $("roadTo").value = G.cities(world).find((c) => c.id !== city.id).id;
+      $("connectForm").onsubmit = (e) => {
+        e.preventDefault();
+        try {
+          G.connect(world, $("roadFrom").value, $("roadTo").value);
+          persist();
+          render();
+          worldMap();
+          toast("Trade route open. Both cities earn +$15 each minute.");
+        } catch (err) {
+          toast(err.message);
+        }
+      };
+    }
+  }
+  if (tier === 3) {
+    let section = document.createElement("section");
+    section.className = "worldActions";
+    section.innerHTML =
+      '<h3>Establish a country</h3><form id="foundCountryForm"><label>Country name<input id="foundCountryName" maxlength="40" required placeholder="New country"></label><label>First city<input id="countryCapital" maxlength="40" required placeholder="Capital city"></label><button class="primary">Create country & capital</button></form>';
+    $("worldForms").append(section);
+    $("foundCountryForm").onsubmit = (e) => {
+      e.preventDefault();
+      try {
+        G.addCountry(
+          world,
+          $("foundCountryName").value,
+          $("countryCapital").value,
+        );
+        city = G.active(world);
+        selected = -1;
+        tool = null;
+        persist();
+        render();
+        center();
+        worldMap();
+        toast("Country established. Your continent is growing.");
+      } catch (err) {
+        toast(err.message);
+      }
+    };
+  }
+}
+$("worldButton").onclick = worldMap;

@@ -1228,7 +1228,8 @@ dialog small {
   .worldDialog #closeModal {
     position: sticky;
     bottom: 0;
-    background: #282727;
+    background: #131313;
+    color: white;
   }
   .worldActions form {
     display: block;
@@ -1699,9 +1700,9 @@ dialog small {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 44px;
-  min-height: 44px;
-  padding: 10px;
+  /* min-width: 44px;
+  min-height: 44px; */
+  padding: 20px;
 }
 .iconWithLabel {
   display: inline-flex;
@@ -1722,8 +1723,8 @@ dialog small {
   color: #2563eb;
 }
 .game .stats small .uiIcon {
-  width: 16px;
-  height: 16px;
+  /* width: 16px;
+  height: 16px; */
   color: #7b8da3;
   margin-bottom: 2px;
 }

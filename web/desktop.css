@@ -564,6 +564,445 @@
     line-height: 19px;
   }
 }
+
+/* Motion lives on the interface; the map canvas and its overlays stay still. */
+.game {
+  --ui-motion-fast: 160ms;
+  --ui-motion: 240ms;
+  --ui-ease: cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+.game button,
+.game a,
+.game input,
+.game select,
+.game summary,
+.game .buildCard,
+.game .countryCard,
+.game .payment,
+.game .milestone {
+  transition:
+    color var(--ui-motion-fast) ease,
+    background-color var(--ui-motion-fast) ease,
+    border-color var(--ui-motion-fast) ease,
+    box-shadow var(--ui-motion) var(--ui-ease),
+    transform var(--ui-motion) var(--ui-ease);
+}
+.game button:active,
+.game .buildCard:active {
+  transform: scale(0.97);
+}
+.game button:focus-visible,
+.game input:focus-visible,
+.game select:focus-visible {
+  box-shadow: 0 0 0 4px #2563eb24;
+}
+.game button.clickFeedback {
+  animation: button-click-ring 320ms var(--ui-ease);
+}
+.game button.clickFeedback .uiIcon,
+.game button.clickFeedback .menuIcon {
+  animation: icon-click-pop 320ms var(--ui-ease);
+}
+.game .buildCard.clickFeedback canvas {
+  animation: building-card-pop 320ms var(--ui-ease);
+}
+.game .logo {
+  animation: city-mark-arrive 700ms var(--ui-ease) both;
+}
+.game .cityLogo {
+  transform-origin: 50% 70%;
+  transition: transform var(--ui-motion) var(--ui-ease);
+}
+.game .brand:hover .cityLogo {
+  transform: translateY(-2px) rotate(-5deg);
+}
+.game header.gameHeader .stats > div {
+  animation: ui-rise-in 480ms var(--ui-ease) both;
+}
+.game header.gameHeader .stats > div:nth-child(2) {
+  animation-delay: 55ms;
+}
+.game header.gameHeader .stats > div:nth-child(3) {
+  animation-delay: 110ms;
+}
+.game header.gameHeader .stats > div:nth-child(4) {
+  animation-delay: 165ms;
+}
+.game .stats strong {
+  transition:
+    color var(--ui-motion) ease,
+    transform var(--ui-motion) var(--ui-ease);
+}
+.game .stats > div:hover strong {
+  transform: translateY(-1px);
+}
+.game .headerActions .uiIcon,
+.game .headerActions .menuIcon {
+  transition: transform var(--ui-motion) var(--ui-ease);
+}
+.game .headerActions button:hover .uiIcon,
+.game .headerActions button:hover .menuIcon {
+  transform: scale(1.1) rotate(-5deg);
+}
+.game #builder > .sectionHeading,
+.game #details > .sectionHeading,
+.game .payment,
+.game #services > *,
+.game #selected:not(:empty),
+.game .milestone,
+.game #achievements,
+.game #saveState {
+  animation: ui-rise-in 500ms var(--ui-ease) both;
+}
+.game #details .payment {
+  animation-delay: 70ms;
+}
+.game #services > :nth-child(2) {
+  animation-delay: 45ms;
+}
+.game #services > :nth-child(3) {
+  animation-delay: 90ms;
+}
+.game #services > :nth-child(4) {
+  animation-delay: 135ms;
+}
+.game #services > :nth-child(5) {
+  animation-delay: 180ms;
+}
+.game .buildCard {
+  transform-origin: 50% 50%;
+}
+.game .buildCard canvas {
+  transition:
+    transform var(--ui-motion) var(--ui-ease),
+    box-shadow var(--ui-motion) var(--ui-ease);
+}
+.game .buildCard:hover canvas {
+  transform: scale(1.06) rotate(-2deg);
+  box-shadow: 0 4px 12px #31465b18;
+}
+.game #categories button.iconOnly .uiIcon {
+  transition: transform var(--ui-motion) var(--ui-ease);
+}
+.game #categories button.iconOnly:hover .uiIcon,
+.game #categories button.iconOnly.active .uiIcon {
+  transform: translateY(-2px) scale(1.08);
+}
+.game progress::-webkit-progress-value {
+  transition: width 600ms var(--ui-ease);
+}
+.game progress::-moz-progress-bar {
+  transition: width 600ms var(--ui-ease);
+}
+.game #toast.show {
+  animation: toast-pop 320ms var(--ui-ease) both;
+}
+.game dialog[open] {
+  animation: dialog-arrive 300ms var(--ui-ease) both;
+}
+.game dialog[open]::backdrop {
+  animation: backdrop-arrive 240ms ease both;
+}
+.game .cityMenu[open] .menuActions > * {
+  animation: ui-rise-in 360ms var(--ui-ease) both;
+}
+.game .cityMenu[open] .menuActions > :nth-child(2) {
+  animation-delay: 45ms;
+}
+.game .cityMenu[open] .menuActions > :nth-child(3) {
+  animation-delay: 90ms;
+}
+.game .cityMenu[open] .menuActions > :nth-child(4) {
+  animation-delay: 135ms;
+}
+.game .cityMenu[open] .menuActions > :nth-child(5) {
+  animation-delay: 180ms;
+}
+.game .saveState {
+  transition: color var(--ui-motion) ease;
+}
+.game #details .liveDot {
+  animation: live-pulse 2.4s ease-in-out infinite;
+}
+
+.game .musicControls {
+  position: absolute;
+  z-index: 2;
+  left: 14px;
+  bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 205px;
+  min-height: 54px;
+  padding: 7px 12px 7px 7px;
+  border: 1px solid #dfe7ed;
+  border-radius: 13px;
+  background: #fff;
+  box-shadow: 0 4px 16px #25384d18;
+}
+.game #musicToggle {
+  position: relative;
+  display: inline-flex;
+  place-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: 0 0 72px;
+  width: 72px;
+  height: 38px;
+  min-height: 38px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 10px;
+  background: #edf3fa;
+  color: #45617d;
+  font-size: 11px;
+  font-weight: 650;
+}
+.game #musicToggle::after {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  z-index: 5;
+  padding: 6px 9px;
+  border: 1px solid #dfe6ed;
+  border-radius: 7px;
+  background: #26374a;
+  color: #fff;
+  content: attr(data-tooltip);
+  font-size: 10px;
+  font-weight: 550;
+  line-height: 1.2;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 4px);
+  transition:
+    opacity 140ms ease,
+    transform 140ms ease;
+}
+.game #musicToggle:hover::after,
+.game #musicToggle:focus-visible::after {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+.game #musicToggle:hover,
+.game .musicControls.playing #musicToggle {
+  background: #e7effb;
+  color: #2563eb;
+}
+.game #musicToggle svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+.game #musicToggle svg[hidden] {
+  display: none;
+}
+.game #musicToggleLabel {
+  min-width: 31px;
+  text-align: left;
+}
+.game .musicVolumeControl {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  color: #53677d;
+  font-size: 10px;
+  font-weight: 650;
+}
+.game .musicLabels {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.game #musicVolumeValue {
+  color: #8291a2;
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+}
+.game #musicVolume {
+  width: 100%;
+  height: 14px;
+  margin: 0;
+  padding: 0;
+  accent-color: #4e79b8;
+  cursor: pointer;
+}
+
+@keyframes ui-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(9px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes city-mark-arrive {
+  0% {
+    opacity: 0;
+    transform: scale(0.75) rotate(-9deg);
+  }
+  70% {
+    transform: scale(1.08) rotate(3deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+@keyframes toast-pop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+@keyframes dialog-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes backdrop-arrive {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes live-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 #42a07800;
+  }
+  50% {
+    box-shadow: 0 0 0 4px #42a07820;
+  }
+}
+@keyframes button-click-ring {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 #2563eb00;
+  }
+  40% {
+    box-shadow: 0 0 0 4px #2563eb24;
+  }
+}
+@keyframes icon-click-pop {
+  0%,
+  100% {
+    transform: scale(1) rotate(0);
+  }
+  40% {
+    transform: scale(0.82) rotate(-10deg);
+  }
+  75% {
+    transform: scale(1.12) rotate(4deg);
+  }
+}
+@keyframes building-card-pop {
+  0%,
+  100% {
+    transform: scale(1) rotate(0);
+  }
+  40% {
+    transform: scale(0.9) rotate(-4deg);
+  }
+  75% {
+    transform: scale(1.08) rotate(3deg);
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+  .game .buildCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px #29435c12;
+  }
+  .game #categories button:hover,
+  .game .headerActions button:hover,
+  .game .countryCard:hover,
+  .game .worldCity:hover {
+    transform: translateY(-1px);
+  }
+}
+@media (max-width: 900px), (max-height: 500px) and (pointer: coarse) {
+  .game .musicControls {
+    left: 10px;
+    bottom: 68px;
+    width: min(205px, calc(100% - 20px));
+    min-height: 52px;
+  }
+  .game #musicToggle {
+    width: 72px;
+    height: 40px;
+    min-height: 40px;
+    flex-basis: 72px;
+  }
+  .game #builder.mobileOpen,
+  .game #details.mobileOpen {
+    animation: sheet-arrive 360ms var(--ui-ease) both;
+    transform-origin: 50% 100%;
+  }
+  .game #mobileNav button {
+    transition:
+      background-color var(--ui-motion) ease,
+      color var(--ui-motion) ease,
+      transform var(--ui-motion) var(--ui-ease);
+  }
+  .game #mobileNav button.active {
+    transform: translateY(-2px);
+  }
+  .game #mobileNav button .uiIcon {
+    transition: transform var(--ui-motion) var(--ui-ease);
+  }
+  .game #mobileNav button.active .uiIcon {
+    transform: translateY(-2px) scale(1.1);
+  }
+  .game .buildCard {
+    animation: ui-rise-in 360ms var(--ui-ease) both;
+  }
+  .game .buildCard:nth-child(2) {
+    animation-delay: 35ms;
+  }
+  .game .buildCard:nth-child(3) {
+    animation-delay: 70ms;
+  }
+  .game .buildCard:nth-child(4) {
+    animation-delay: 105ms;
+  }
+}
+@keyframes sheet-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .game *,
+  .game *::before,
+  .game *::after {
+    animation: none !important;
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}
 @media (min-width: 901px) and (max-width: 1150px) and (min-height: 501px),
   (min-width: 901px) and (max-width: 1150px) and (pointer: fine) {
   .game main {
@@ -625,27 +1064,6 @@
   .game .buildCard b {
     font-size: 13px;
   }
-}
-.game .dayNightControls {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex: none;
-}
-.game .dayNightControls button {
-  min-height: 34px;
-  padding: 6px 9px;
-  border: 1px solid #dfe7ed;
-  border-radius: 8px;
-  background: #fff;
-  color: #617287;
-  font-size: 10px;
-  font-weight: 650;
-}
-.game .dayNightControls button[aria-pressed="true"] {
-  border-color: #8eb0e6;
-  background: #edf4ff;
-  color: #2563eb;
 }
 .game.night {
   color-scheme: dark;
@@ -1085,13 +1503,6 @@ body.game.night #details .saveState {
   }
 }
 @media (max-width: 500px) {
-  .game .dayNightControls {
-    gap: 2px;
-  }
-  .game .dayNightControls button {
-    padding: 6px 7px;
-    font-size: 9px;
-  }
   .game .mapBottom {
     gap: 5px;
   }
