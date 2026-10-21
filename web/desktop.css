@@ -1,102 +1,1236 @@
 /* Desktop owns its panel proportions; phone sheets keep their existing styles. */
-@media(min-width:901px) and (min-height:501px),(min-width:901px) and (pointer:fine){
-  .game main{grid-template-columns:248px minmax(0,1fr) 266px;align-items:stretch;min-height:0}
-  .game #builder,.game #details{position:static;display:block;width:auto;min-width:0;max-height:none;min-height:0;padding:22px 18px;overflow-x:hidden;overflow-y:auto;border-radius:0;box-shadow:none;scrollbar-gutter:stable}
-  .game #builder{border:0;border-right:1px solid #e4eaf1}.game #details{border:0;border-left:1px solid #e4eaf1}
-  .game .mobileSheetHeader{display:none}
-  .game #builder>.sectionHeading{display:flex;align-items:center;gap:8px;flex-wrap:wrap;line-height:1.5;font-size:9px;letter-spacing:.8px}
-  .game #builder>.sectionHeading>span:first-child{max-width:none;flex:none;white-space:nowrap}
-  .game #level{padding:4px 6px;font-size:9px;white-space:nowrap;letter-spacing:0}
-  .game #builder h1{display:block;font-size:23px;line-height:1.25;letter-spacing:-.6px;margin:18px 0 8px}
-  .game #builder>.muted{display:block;font-size:11px;line-height:1.7;margin:0 0 17px}
-  .game #categories{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;margin:0 0 16px;padding:4px;background:#f5f7fa;border:1px solid #ecf0f5;border-radius:10px;overflow:visible}
-  .game #categories button.iconOnly{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;width:100%;min-width:0;min-height:51px;padding:6px 0;border-radius:7px;color:#8291a4}
-  .game #categories button.iconOnly .uiIcon{width:20px;height:20px}
-  .game #categories button.iconOnly::after{content:attr(aria-label);font-size:8px;line-height:1;font-weight:600}
-  .game #categories button[aria-label=Essentials]::after{content:'Basics'}
-  .game #categories button[aria-label=Business]::after{content:'Work'}
-  .game #categories button[aria-label=Services]::after{content:'City'}
-  .game #categories button[aria-label=Utilities]::after{content:'Power'}
-  .game #categories button.active{background:#fff;color:#2563eb;box-shadow:0 1px 4px #243d6010}
-  .game #buildList{display:flex;flex-direction:column;gap:9px;overflow:visible}
-  .game .buildCard{display:flex;align-items:center;flex-wrap:nowrap;gap:9px;min-width:0;width:100%;min-height:76px;margin:0;padding:10px 9px;border:1px solid #e5eaf0;border-radius:10px;background:white}
-  .game .buildCard canvas{flex:0 0 46px;width:46px;height:46px;background:#f1f5f1;border-radius:8px}
-  .game .buildCard>span:not(.price){flex:1;min-width:0}
-  .game .buildCard b{font-size:12px;font-weight:650;line-height:1.4;margin-bottom:4px;overflow-wrap:normal}
-  .game .buildCard small{display:block;font-size:10px;line-height:1.5;color:#8794a5}
-  .game .buildCard .price{flex:none;width:auto;margin:0;font-size:10px;white-space:nowrap;font-variant-numeric:tabular-nums}
-  .game .buildCard.active{border-color:#8eb0e6;background:#f2f6ff;box-shadow:0 0 0 1px #8eb0e6}
-  .game .tip{display:block;margin-top:18px;padding:13px;font-size:11px}
-  .game #inspectTool{display:flex;width:100%;min-height:42px;margin-top:12px}
-  .game #details>.sectionHeading{display:flex;align-items:center;min-height:21px;font-size:9px;letter-spacing:1px}
-  .game #details>h2,.game #details>.muted{display:none}
-  .game #details .payment{margin:16px 0 20px;padding:15px;border-radius:11px;font-size:12px}
-  .game #details .payment p{font-size:11px;line-height:1.5}
-  .game #details>h3{font-size:13px;margin:20px 0 13px}
-  .game .service{font-size:11px;line-height:1.5;margin:13px 0}
-  .game .service progress{margin-top:6px;height:5px}
-  .game #districtBenefits{font-size:10px;line-height:1.7;color:#7f8ea1}
-  .game #selected:not(:empty){padding:14px;margin:16px 0 18px;border-radius:11px;line-height:1.7;font-size:12px}
-  .game #selected h3{font-size:14px}.game #selected button{min-height:42px;font-size:11px}
-  .game .milestone{padding-top:18px;margin-top:20px}.game .milestone p{font-size:10px;line-height:1.7}
-  .game #achievements{min-height:42px}.game .saveState{font-size:10px;line-height:1.6}
-  .game .mapHeading{left:20px;right:20px;top:20px}.game #mapLabel{min-width:0;max-width:48%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .game #toolLabel{max-width:48%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .game #coords{font-size:9px}.game .zoom{flex:none}
+@media (min-width: 901px) and (min-height: 501px),
+  (min-width: 901px) and (pointer: fine) {
+  .game main {
+    grid-template-columns: 248px minmax(0, 1fr) 266px;
+    align-items: stretch;
+    min-height: 0;
+  }
+  .game #builder,
+  .game #details {
+    position: static;
+    display: block;
+    width: auto;
+    min-width: 0;
+    max-height: none;
+    min-height: 0;
+    padding: 22px 18px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border-radius: 0;
+    box-shadow: none;
+    scrollbar-gutter: stable;
+  }
+  .game #builder {
+    border: 0;
+    border-right: 1px solid #e4eaf1;
+  }
+  .game #details {
+    border: 0;
+    border-left: 1px solid #e4eaf1;
+  }
+  .game .mobileSheetHeader {
+    display: none;
+  }
+  .game #builder > .sectionHeading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    line-height: 1.5;
+    font-size: 9px;
+    letter-spacing: 0.8px;
+  }
+  .game #builder > .sectionHeading > span:first-child {
+    max-width: none;
+    flex: none;
+    white-space: nowrap;
+  }
+  .game #level {
+    padding: 4px 6px;
+    font-size: 9px;
+    white-space: nowrap;
+    letter-spacing: 0;
+  }
+  .game #builder h1 {
+    display: block;
+    font-size: 23px;
+    line-height: 1.25;
+    letter-spacing: -0.6px;
+    margin: 18px 0 8px;
+  }
+  .game #builder > .muted {
+    display: block;
+    font-size: 11px;
+    line-height: 1.7;
+    margin: 0 0 17px;
+  }
+  .game #categories {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 3px;
+    margin: 0 0 16px;
+    padding: 4px;
+    background: #f5f7fa;
+    border: 1px solid #ecf0f5;
+    border-radius: 10px;
+    overflow: visible;
+  }
+  .game #categories button.iconOnly {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    width: 100%;
+    min-width: 0;
+    min-height: 51px;
+    padding: 6px 0;
+    border-radius: 7px;
+    color: #8291a4;
+  }
+  .game #categories button.iconOnly .uiIcon {
+    width: 20px;
+    height: 20px;
+  }
+  .game #categories button.iconOnly::after {
+    content: attr(aria-label);
+    font-size: 8px;
+    line-height: 1;
+    font-weight: 600;
+  }
+  .game #categories button[aria-label="Essentials"]::after {
+    content: "Basics";
+  }
+  .game #categories button[aria-label="Business"]::after {
+    content: "Work";
+  }
+  .game #categories button[aria-label="Services"]::after {
+    content: "City";
+  }
+  .game #categories button[aria-label="Utilities"]::after {
+    content: "Power";
+  }
+  .game #categories button.active {
+    background: #fff;
+    color: #2563eb;
+    box-shadow: 0 1px 4px #243d6010;
+  }
+  .game #buildList {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    overflow: visible;
+  }
+  .game .buildCard {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 9px;
+    min-width: 0;
+    width: 100%;
+    min-height: 76px;
+    margin: 0;
+    padding: 10px 9px;
+    border: 1px solid #e5eaf0;
+    border-radius: 10px;
+    background: white;
+  }
+  .game .buildCard canvas {
+    flex: 0 0 46px;
+    width: 46px;
+    height: 46px;
+    background: #f1f5f1;
+    border-radius: 8px;
+  }
+  .game .buildCard > span:not(.price) {
+    flex: 1;
+    min-width: 0;
+  }
+  .game .buildCard b {
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.4;
+    margin-bottom: 4px;
+    overflow-wrap: normal;
+  }
+  .game .buildCard small {
+    display: block;
+    font-size: 10px;
+    line-height: 1.5;
+    color: #8794a5;
+  }
+  .game .buildCard .price {
+    flex: none;
+    width: auto;
+    margin: 0;
+    font-size: 10px;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .game .buildCard.active {
+    border-color: #8eb0e6;
+    background: #f2f6ff;
+    box-shadow: 0 0 0 1px #8eb0e6;
+  }
+  .game .tip {
+    display: block;
+    margin-top: 18px;
+    padding: 13px;
+    font-size: 11px;
+  }
+  .game #inspectTool {
+    display: flex;
+    width: 100%;
+    min-height: 42px;
+    margin-top: 12px;
+  }
+  .game #details > .sectionHeading {
+    display: flex;
+    align-items: center;
+    min-height: 21px;
+    font-size: 9px;
+    letter-spacing: 1px;
+  }
+  .game #details > h2,
+  .game #details > .muted {
+    display: none;
+  }
+  .game #details .payment {
+    margin: 16px 0 20px;
+    padding: 15px;
+    border-radius: 11px;
+    font-size: 12px;
+  }
+  .game #details .payment p {
+    font-size: 11px;
+    line-height: 1.5;
+  }
+  .game #details > h3 {
+    font-size: 13px;
+    margin: 20px 0 13px;
+  }
+  .game .service {
+    font-size: 11px;
+    line-height: 1.5;
+    margin: 13px 0;
+  }
+  .game .service progress {
+    margin-top: 6px;
+    height: 5px;
+  }
+  .game #districtBenefits {
+    font-size: 10px;
+    line-height: 1.7;
+    color: #7f8ea1;
+  }
+  .game #selected:not(:empty) {
+    padding: 14px;
+    margin: 16px 0 18px;
+    border-radius: 11px;
+    line-height: 1.7;
+    font-size: 12px;
+  }
+  .game #selected h3 {
+    font-size: 14px;
+  }
+  .game #selected button {
+    min-height: 42px;
+    font-size: 11px;
+  }
+  .game .milestone {
+    padding-top: 18px;
+    margin-top: 20px;
+  }
+  .game .milestone p {
+    font-size: 10px;
+    line-height: 1.7;
+  }
+  .game #achievements {
+    min-height: 42px;
+  }
+  .game .saveState {
+    font-size: 10px;
+    line-height: 1.6;
+  }
+  .game .mapHeading {
+    left: 20px;
+    right: 20px;
+    top: 20px;
+  }
+  .game #mapLabel {
+    min-width: 0;
+    max-width: 48%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .game #toolLabel {
+    max-width: 48%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .game #coords {
+    font-size: 9px;
+  }
+  .game .zoom {
+    flex: none;
+  }
 }
-@media(min-width:901px) and (max-width:1099px) and (min-height:501px),(min-width:901px) and (max-width:1099px) and (pointer:fine){
-  .game main{grid-template-columns:218px minmax(0,1fr) 228px}
-  .game #builder,.game #details{padding:18px 12px}
-  .game #builder h1{font-size:21px}
-  .game .buildCard{padding:9px 7px;gap:7px}.game .buildCard canvas{flex-basis:38px;width:38px;height:38px}
-  .game .buildCard b{font-size:11px}.game .buildCard small{font-size:9px}.game .buildCard .price{font-size:9px}
-  .game .mapHeading{left:14px;right:14px;top:14px}.game #coords{display:none}.game .mapBottom{justify-content:flex-end}
+@media (min-width: 901px) and (max-width: 1099px) and (min-height: 501px),
+  (min-width: 901px) and (max-width: 1099px) and (pointer: fine) {
+  .game main {
+    grid-template-columns: 218px minmax(0, 1fr) 228px;
+  }
+  .game #builder,
+  .game #details {
+    padding: 18px 12px;
+  }
+  .game #builder h1 {
+    font-size: 21px;
+  }
+  .game .buildCard {
+    padding: 9px 7px;
+    gap: 7px;
+  }
+  .game .buildCard canvas {
+    flex-basis: 38px;
+    width: 38px;
+    height: 38px;
+  }
+  .game .buildCard b {
+    font-size: 11px;
+  }
+  .game .buildCard small {
+    font-size: 9px;
+  }
+  .game .buildCard .price {
+    font-size: 9px;
+  }
+  .game .mapHeading {
+    left: 14px;
+    right: 14px;
+    top: 14px;
+  }
+  .game #coords {
+    display: none;
+  }
+  .game .mapBottom {
+    justify-content: flex-end;
+  }
 }
-@media(min-width:1500px) and (min-height:501px){
-  .game main{grid-template-columns:280px minmax(0,1fr) 290px}
-  .game #builder,.game #details{padding:26px 22px}
-  .game .buildCard{min-height:82px;padding:12px;gap:11px}.game .buildCard canvas{flex-basis:50px;width:50px;height:50px}
-  .game .buildCard b{font-size:13px}.game .buildCard small,.game .buildCard .price{font-size:11px}
+@media (min-width: 1500px) and (min-height: 501px) {
+  .game main {
+    grid-template-columns: 280px minmax(0, 1fr) 290px;
+  }
+  .game #builder,
+  .game #details {
+    padding: 26px 22px;
+  }
+  .game .buildCard {
+    min-height: 82px;
+    padding: 12px;
+    gap: 11px;
+  }
+  .game .buildCard canvas {
+    flex-basis: 50px;
+    width: 50px;
+    height: 50px;
+  }
+  .game .buildCard b {
+    font-size: 13px;
+  }
+  .game .buildCard small,
+  .game .buildCard .price {
+    font-size: 11px;
+  }
 }
 /* Desktop workspace: framed map, compact controls, and readable catalog cards. */
-@media(min-width:901px) and (min-height:501px),(min-width:901px) and (pointer:fine){
-  body.game{background:#f0f4f8}
-  .game main{margin:12px;gap:12px;grid-template-columns:258px minmax(0,1fr) 264px;overflow:hidden}
-  .game #builder,.game #details{padding:18px 16px;border:1px solid #dfe6ee;border-radius:14px;background:#fff;box-shadow:0 2px 8px #29435c06;scrollbar-width:thin}
-  .game #mapArea{border:1px solid #cfddcf;border-radius:15px;isolation:isolate;overflow:hidden}
-  .game #builder h1,.game #builder>.muted{display:none}
-  .game #builder>.sectionHeading{font-size:10px;letter-spacing:.6px;margin:0 0 16px;min-height:24px;color:#51677f}
-  .game #level{font-size:8px;padding:5px 7px;border-radius:6px;background:#eef4ff;color:#5a7baa}
-  .game #categories{margin-bottom:15px;background:#f1f5f9;border:0;padding:4px;gap:3px}
-  .game #categories button.iconOnly{min-height:50px}.game #categories button.iconOnly::after{font-size:9px}
-  .game .buildCard{min-height:82px;gap:10px;padding:10px;background:#f9fbfd;border-color:#edf1f6;border-radius:10px}
-  .game .buildCard canvas{width:52px;height:52px;flex-basis:52px;border-radius:9px;background:#e8f0e4}
-  .game .buildCard b{font-size:12px;line-height:1.4;color:#364d66}.game .buildCard small{font-size:10px;line-height:1.6}
-  .game .buildCard .price{padding:5px 6px;border-radius:5px;background:#edf3fa;color:#6684a7;font-size:10px}
-  .game .buildCard:hover{background:#f0f5fc;border-color:#d2e0ef}.game .buildCard.active{background:#edf4ff;border-color:#86a9d7;box-shadow:0 0 0 1px #86a9d7}
-  .game .tip{background:#f6f8fb;border:1px solid #edf1f6;color:#8896a6;font-size:10px;padding:11px;margin-top:16px}
-  .game #details>.sectionHeading{color:#51677f;font-size:10px;letter-spacing:.6px}
-  .game #details .payment{background:#f5f8fc;border:1px solid #e8eef6;padding:15px;margin-top:16px;border-radius:11px}
-  .game #details .payment strong{font-size:25px;font-weight:650;letter-spacing:-1px;font-variant-numeric:tabular-nums}
-  .game #selected:not(:empty){background:#f2f7ff;border-color:#c3d6ef}
-  .game #details>h3{font-size:12px;font-weight:650;color:#51677f}
-  .game .service{font-size:11px;margin:13px 0}.game .service progress{height:5px}
-  .game .mapHeading{left:14px;right:14px;top:14px;gap:8px}
-  .game #mapLabel{background:#ffffffdf;border:1px solid #dbe5da;border-radius:8px;padding:10px 12px;font-size:9px;color:#728b74}
-  .game .mapHeading>.liveDot{display:none}.game #toolLabel{background:#ffffffeb;border:1px solid #dbe5da;padding:10px 12px;font-size:11px;color:#6d8392}
-  .game .mapBottom{left:14px;right:14px;bottom:14px}.game .zoom{border:1px solid #dbe4df;box-shadow:0 3px 12px #40583f0c}
-  .game footer{background:transparent;border:0;color:#95a2b1;padding:0 18px;height:22px;min-height:22px;font-size:8px}
-  .game header.gameHeader{border-bottom-color:#e0e7ef;box-shadow:0 1px 6px #223c5504}
-  .game header.gameHeader .stats>div{height:54px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;padding:7px 12px;border-color:#edf1f6;background:#f7f9fc}
-  .game header.gameHeader .stats small{width:auto;height:13px;gap:5px}.game header.gameHeader .stats small .uiIcon{width:12px;height:12px}
-  .game header.gameHeader .stats small::after{content:attr(aria-label);font-size:7px;letter-spacing:.7px;font-weight:600;white-space:nowrap}
-  .game header.gameHeader .stats strong{font-size:15px;line-height:19px}
+@media (min-width: 901px) and (min-height: 501px),
+  (min-width: 901px) and (pointer: fine) {
+  body.game {
+    background: #f0f4f8;
+  }
+  .game main {
+    margin: 12px;
+    gap: 12px;
+    grid-template-columns: 258px minmax(0, 1fr) 264px;
+    overflow: hidden;
+  }
+  .game #builder,
+  .game #details {
+    padding: 18px 16px;
+    border: 1px solid #dfe6ee;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 2px 8px #29435c06;
+    scrollbar-width: thin;
+  }
+  .game #mapArea {
+    border: 1px solid #cfddcf;
+    border-radius: 15px;
+    isolation: isolate;
+    overflow: hidden;
+  }
+  .game #builder h1,
+  .game #builder > .muted {
+    display: none;
+  }
+  .game #builder > .sectionHeading {
+    font-size: 10px;
+    letter-spacing: 0.6px;
+    margin: 0 0 16px;
+    min-height: 24px;
+    color: #51677f;
+  }
+  .game #level {
+    font-size: 8px;
+    padding: 5px 7px;
+    border-radius: 6px;
+    background: #eef4ff;
+    color: #5a7baa;
+  }
+  .game #categories {
+    margin-bottom: 15px;
+    background: #f1f5f9;
+    border: 0;
+    padding: 4px;
+    gap: 3px;
+  }
+  .game #categories button.iconOnly {
+    min-height: 50px;
+  }
+  .game #categories button.iconOnly::after {
+    font-size: 9px;
+  }
+  .game .buildCard {
+    min-height: 82px;
+    gap: 10px;
+    padding: 10px;
+    background: #f9fbfd;
+    border-color: #edf1f6;
+    border-radius: 10px;
+  }
+  .game .buildCard canvas {
+    width: 52px;
+    height: 52px;
+    flex-basis: 52px;
+    border-radius: 9px;
+    background: #e8f0e4;
+  }
+  .game .buildCard b {
+    font-size: 12px;
+    line-height: 1.4;
+    color: #364d66;
+  }
+  .game .buildCard small {
+    font-size: 10px;
+    line-height: 1.6;
+  }
+  .game .buildCard .price {
+    padding: 5px 6px;
+    border-radius: 5px;
+    background: #1a314b;
+    color: #cfe2f7;
+    font-size: 10px;
+  }
+  .game .buildCard:hover {
+    background: #f0f5fc;
+    border-color: #d2e0ef;
+  }
+  .game .buildCard.active {
+    background: #edf4ff;
+    border-color: #86a9d7;
+    box-shadow: 0 0 0 1px #86a9d7;
+  }
+  .game .tip {
+    background: #f6f8fb;
+    border: 1px solid #edf1f6;
+    color: #8896a6;
+    font-size: 10px;
+    padding: 11px;
+    margin-top: 16px;
+  }
+  .game #details > .sectionHeading {
+    color: #51677f;
+    font-size: 10px;
+    letter-spacing: 0.6px;
+  }
+  .game #details .payment {
+    background: #f5f8fc;
+    border: 1px solid #e8eef6;
+    padding: 15px;
+    margin-top: 16px;
+    border-radius: 11px;
+  }
+  .game #details .payment strong {
+    font-size: 25px;
+    font-weight: 650;
+    letter-spacing: -1px;
+    font-variant-numeric: tabular-nums;
+  }
+  .game #selected:not(:empty) {
+    background: #f2f7ff;
+    border-color: #c3d6ef;
+  }
+  .game #details > h3 {
+    font-size: 12px;
+    font-weight: 650;
+    color: #51677f;
+  }
+  .game .service {
+    font-size: 11px;
+    margin: 13px 0;
+  }
+  .game .service progress {
+    height: 5px;
+  }
+  .game .mapHeading {
+    left: 14px;
+    right: 14px;
+    top: 14px;
+    gap: 8px;
+  }
+  .game #mapLabel {
+    background: #ffffffdf;
+    border: 1px solid #dbe5da;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 9px;
+    color: #728b74;
+  }
+  .game .mapHeading > .liveDot {
+    display: none;
+  }
+  .game #toolLabel {
+    background: #ffffffeb;
+    border: 1px solid #dbe5da;
+    padding: 10px 12px;
+    font-size: 11px;
+    color: #6d8392;
+  }
+  .game .mapBottom {
+    left: 14px;
+    right: 14px;
+    bottom: 14px;
+  }
+  .game .zoom {
+    border: 1px solid #dbe4df;
+    box-shadow: 0 3px 12px #40583f0c;
+  }
+  .game footer {
+    background: transparent;
+    border: 0;
+    color: #95a2b1;
+    padding: 0 18px;
+    height: 22px;
+    min-height: 22px;
+    font-size: 8px;
+  }
+  .game header.gameHeader {
+    border-bottom-color: #e0e7ef;
+    box-shadow: 0 1px 6px #223c5504;
+  }
+  .game header.gameHeader .stats > div {
+    height: 54px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 3px;
+    padding: 7px 12px;
+    border-color: #edf1f6;
+    background: #f7f9fc;
+  }
+  .game header.gameHeader .stats small {
+    width: auto;
+    height: 13px;
+    gap: 5px;
+  }
+  .game header.gameHeader .stats small .uiIcon {
+    width: 12px;
+    height: 12px;
+  }
+  .game header.gameHeader .stats small::after {
+    content: attr(aria-label);
+    font-size: 7px;
+    letter-spacing: 0.7px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .game header.gameHeader .stats strong {
+    font-size: 15px;
+    line-height: 19px;
+  }
 }
-@media(min-width:901px) and (max-width:1150px) and (min-height:501px),(min-width:901px) and (max-width:1150px) and (pointer:fine){
-  .game main{margin:8px;gap:8px;grid-template-columns:214px minmax(0,1fr) 218px}
-  .game #builder,.game #details{padding:14px 10px;border-radius:11px}
-  .game .buildCard{min-height:76px;padding:9px 6px;gap:6px}.game .buildCard canvas{width:38px;height:38px;flex-basis:38px}
-  .game .buildCard b{font-size:11px}.game .buildCard .price{padding:4px;font-size:9px}.game #categories button.iconOnly::after{font-size:8px}
-  .game header.gameHeader .stats>div{padding:7px 8px}.game header.gameHeader .stats small::after{font-size:6px;letter-spacing:.2px}
+@media (min-width: 901px) and (max-width: 1150px) and (min-height: 501px),
+  (min-width: 901px) and (max-width: 1150px) and (pointer: fine) {
+  .game main {
+    margin: 8px;
+    gap: 8px;
+    grid-template-columns: 214px minmax(0, 1fr) 218px;
+  }
+  .game #builder,
+  .game #details {
+    padding: 14px 10px;
+    border-radius: 11px;
+  }
+  .game .buildCard {
+    min-height: 76px;
+    padding: 9px 6px;
+    gap: 6px;
+  }
+  .game .buildCard canvas {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+  }
+  .game .buildCard b {
+    font-size: 11px;
+  }
+  .game .buildCard .price {
+    padding: 4px;
+    font-size: 9px;
+  }
+  .game #categories button.iconOnly::after {
+    font-size: 8px;
+  }
+  .game header.gameHeader .stats > div {
+    padding: 7px 8px;
+  }
+  .game header.gameHeader .stats small::after {
+    font-size: 6px;
+    letter-spacing: 0.2px;
+  }
 }
-@media(min-width:1550px) and (min-height:501px){.game main{grid-template-columns:288px minmax(0,1fr) 282px;gap:14px;margin:14px}.game #builder,.game #details{padding:22px 18px}.game .buildCard{min-height:88px}.game .buildCard canvas{width:56px;height:56px;flex-basis:56px}.game .buildCard b{font-size:13px}}
+@media (min-width: 1550px) and (min-height: 501px) {
+  .game main {
+    grid-template-columns: 288px minmax(0, 1fr) 282px;
+    gap: 14px;
+    margin: 14px;
+  }
+  .game #builder,
+  .game #details {
+    padding: 22px 18px;
+  }
+  .game .buildCard {
+    min-height: 88px;
+  }
+  .game .buildCard canvas {
+    width: 56px;
+    height: 56px;
+    flex-basis: 56px;
+  }
+  .game .buildCard b {
+    font-size: 13px;
+  }
+}
+.game .dayNightControls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+}
+.game .dayNightControls button {
+  min-height: 34px;
+  padding: 6px 9px;
+  border: 1px solid #dfe7ed;
+  border-radius: 8px;
+  background: #fff;
+  color: #617287;
+  font-size: 10px;
+  font-weight: 650;
+}
+.game .dayNightControls button[aria-pressed="true"] {
+  border-color: #8eb0e6;
+  background: #edf4ff;
+  color: #2563eb;
+}
+.game.night {
+  color-scheme: dark;
+  background: #172131;
+  color: #e3e9f0;
+}
+.game.night header.gameHeader,
+.game.night #builder,
+.game.night #details,
+.game.night footer {
+  border-color: #354153;
+  background: #202b3b;
+  color: #e3e9f0;
+}
+.game.night .brand,
+.game.night #cityName,
+.game.night h1,
+.game.night h2,
+.game.night h3,
+.game.night .stats strong {
+  color: #e3e9f0;
+}
+.game.night .brand small,
+.game.night .stats small {
+  color: #a8b4c3;
+}
+.game.night .stats > div,
+.game.night .buildCard,
+.game.night .payment,
+.game.night .tip,
+.game.night #selected:not(:empty) {
+  border-color: #3b4a5e;
+  background: #293648;
+  color: #e0e6ee;
+}
+.game.night .buildCard small,
+.game.night .muted,
+.game.night .service > div,
+.game.night .payment p,
+.game.night .saveState,
+.game.night .milestone p {
+  color: #b4bfcd;
+}
+.game.night .sectionHeading,
+.game.night .tip,
+.game.night .tip b {
+  color: #bfcbda;
+}
+.game.night .milestone,
+.game.night .payment {
+  border-color: #3b4a5e;
+}
+.game.night #districtBenefits {
+  color: #b4bfcd;
+}
+.game.night button:not(.primary) {
+  border-color: #46566b;
+  background: #303d50;
+  color: #e3e9f0;
+}
+.game.night button:not(.primary):hover {
+  background: #3a4960;
+}
+.game.night #categories button.active,
+.game.night .buildCard.active {
+  border-color: #7897c6;
+  background: #354966;
+  color: #eef4fd;
+}
+.game.night button:focus-visible,
+.game.night a:focus-visible,
+.game.night canvas:focus-visible {
+  outline-color: #a8c6f5;
+}
+.game.night .payment strong,
+.game.night .price {
+  color: #b5ccf0;
+}
+.game.night .dayNightControls button[aria-pressed="true"] {
+  border-color: #8aa8d6;
+  background: #3a4d69;
+  color: #f0f4fb;
+}
+.game.night .mapHeading {
+  color: #f0e8dc;
+}
+.game.night #mapLabel,
+.game.night #toolLabel,
+.game.night .zoom {
+  border: 1px solid #657080;
+  background: #303b4bef;
+  color: #f0f2f5;
+}
+.game.night #coords {
+  color: #e2e8ef;
+}
+.game.night #mapArea::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  content: "";
+  pointer-events: none;
+  background: rgba(8, 15, 31, 0.12);
+}
+.game #map {
+  position: relative;
+  z-index: 0;
+}
+body.game.night #map {
+  filter: brightness(0.72) contrast(1.12) saturate(1.2);
+}
+.game #mapArea > .mapHeading,
+.game #mapArea > .mapBottom,
+.game #mapArea > #toast,
+.game #mapArea > #coopStatus {
+  z-index: 2;
+}
+.game.night dialog {
+  border-color: #46566b;
+  background: #263447;
+  color: #e3e9f0;
+}
+.game.night
+  dialog
+  :is(h1, h2, h3, p, span, small, label, summary, strong, b, li, a) {
+  color: #dbe4ef;
+}
+.game.night dialog .eyebrow,
+.game.night dialog label {
+  color: #a9c7f5;
+}
+.game.night dialog .muted,
+.game.night dialog small,
+.game.night dialog p {
+  color: #b8c5d5;
+}
+.game.night dialog :is(input, select, textarea) {
+  border-color: #53647b;
+  background: #1e2a3a;
+  color: #f0f4f8;
+}
+.game.night dialog option {
+  background: #1e2a3a;
+  color: #f0f4f8;
+}
+.game.night
+  dialog
+  :is(
+    .worldPromotion,
+    .countryCard,
+    .worldActions,
+    .menuActions > *,
+    .journalRow,
+    .coopPanel,
+    .coopRoom
+  ) {
+  border-color: #45566c;
+  background: #2d3b4f;
+  color: #e3e9f0;
+}
+.game.night dialog .worldCity {
+  border-color: #46566b;
+  background: #26364a;
+  color: #e3e9f0;
+}
+.game.night dialog .worldCity small,
+.game.night dialog .menuActions span {
+  color: #bdcad9;
+}
+.game.night dialog .worldAtlas {
+  background: #202e41;
+}
+.game.night dialog .worldAtlas svg {
+  background: #202e41;
+}
+.game.night #toast {
+  border: 1px solid #52647b;
+  background: #29384c;
+  color: #f0f4f8;
+}
+.game.night .primary {
+  background: #4778c5;
+  border-color: #4778c5;
+  color: #fff;
+}
+.game.night .danger {
+  color: #ffaaa5;
+}
+.game.night button.danger {
+  border-color: #a96868;
+  background: #4b343b;
+  color: #ffd2ce;
+}
+.game.night #services progress::-webkit-progress-bar,
+.game.night progress::-webkit-progress-bar {
+  background: #435166;
+}
+.game.night progress::-webkit-progress-value {
+  background: #8eafe3;
+}
+/* Keep secondary labels and controls readable even when component styles set light-theme colors. */
+body.game.night
+  :is(
+    .sectionHeading,
+    .muted,
+    .payment p,
+    .payment span,
+    .service,
+    .service span,
+    .milestone small,
+    .milestone p,
+    .saveState,
+    .tip,
+    .tip p,
+    .tip b,
+    #districtBenefits,
+    .buildCard b,
+    .buildCard small,
+    .price,
+    .neighborhoodNote,
+    .coopStatus,
+    .coopBody p,
+    .coopBody small,
+    .coopPlayers,
+    .coopSignIn,
+    .menuIntro,
+    .menuActions span,
+    .menuRestart p,
+    .worldPromotion,
+    .worldNames,
+    .worldAtlas,
+    .countryCard,
+    .worldActions,
+    .worldCity,
+    .worldCity small,
+    .journalRow,
+    .adminCard,
+    .adminCard p
+  ) {
+  color: #d0d9e5;
+}
+body.game.night
+  :is(
+    .buildCard,
+    .payment,
+    .tip,
+    #selected:not(:empty),
+    .coopStatus,
+    .coopPlayers,
+    .coopSignIn,
+    .menuActions > *,
+    .menuRestart,
+    .worldPromotion,
+    .countryCard,
+    .worldActions,
+    .worldCity,
+    .adminCard
+  ) {
+  background-color: #29384b;
+  border-color: #52647a;
+}
+body.game.night :is(input, select, textarea) {
+  border-color: #5a6b82;
+  background: #202d3e;
+  color: #f1f4f8;
+}
+body.game.night :is(input, select, textarea)::placeholder {
+  color: #aab7c7;
+  opacity: 1;
+}
+body.game.night :is(button, a, .coopSignIn, .worldCity) {
+  color: #e8edf4;
+}
+body.game.night .primary,
+body.game.night button.primary {
+  background: #4778c5;
+  border-color: #6c96d7;
+  color: #fff;
+}
+body.game.night button:disabled {
+  color: #cad3df;
+  opacity: 0.78;
+}
+body.game.night dialog svg text {
+  fill: #e1e8f1;
+}
+body.game.night dialog svg path {
+  stroke: #8fa8c8;
+  background: darkgreen;
+}
+body.game.night dialog svg circle {
+  stroke: #e1e8f1;
+}
+body.game.night .neighborhoodNote {
+  background: #34465d;
+}
+body.game.night .coopSignIn {
+  border-color: #7189ac;
+  background: #31445d;
+}
+body.game.night .coopStatus {
+  border-color: #7189ac;
+  background: #31445d;
+}
+/* Nighttime status tiles use explicit text labels instead of unlabeled icons. */
+body.game.night header.gameHeader {
+  background: #1d2938;
+  border-color: #38485b;
+}
+body.game.night header.gameHeader .stats > div {
+  height: 52px;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+  padding: 5px 7px;
+  border-color: #46576c;
+  border-radius: 9px;
+  background: #2b394c;
+}
+body.game.night header.gameHeader .stats small {
+  display: block;
+  width: auto;
+  height: auto;
+  margin: 0;
+  color: #c1ccda;
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 11px;
+  letter-spacing: 0.7px;
+  text-align: center;
+  white-space: nowrap;
+}
+body.game.night header.gameHeader .stats small .uiIcon {
+  display: none;
+}
+body.game.night header.gameHeader .stats small::after {
+  content: attr(aria-label);
+}
+body.game.night header.gameHeader .stats strong {
+  width: 100%;
+  color: #f4f6fa;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 20px;
+  text-align: center;
+}
+body.game.night header.gameHeader #net {
+  color: #006400;
+}
+body.game.night #builder,
+body.game.night #details {
+  color: #e3e9f0;
+}
+body.game.night #builder #level {
+  border: 1px solid #657b9a;
+  background: #35475e;
+  color: #e5efff;
+}
+body.game.night #details .payment :is(span, b) {
+  color: #d8e1ec;
+}
+body.game.night #details .payment strong,
+body.game.night #details .payment #income,
+body.game.night #details .payment #expenses {
+  color: #c2d7fa;
+}
+body.game.night #details .service > div,
+body.game.night #details .service span {
+  color: #d0d9e5;
+}
+body.game.night #details #districtBenefits,
+body.game.night #details .milestone small,
+body.game.night #details .milestone p {
+  color: #c4cfdd;
+}
+body.game.night #details #selected p,
+body.game.night #details #selected small {
+  color: #d7e0eb;
+}
+body.game.night #details > .sectionHeading,
+body.game.night #details > h2,
+body.game.night #details > h3,
+body.game.night #details h3,
+body.game.night #details > .muted {
+  color: #e3eaf3;
+}
+body.game.night #details .service > div,
+body.game.night #details .service > div span,
+body.game.night #details #districtBenefits {
+  color: #d0d9e5;
+}
+body.game.night #details .milestone small,
+body.game.night #details .milestone p,
+body.game.night #details .saveState {
+  color: #c4cfdd;
+}
+body.game.night #details #selected p,
+body.game.night #details #selected small {
+  color: #d7e0eb;
+}
+body.game.night #builder .buildCard:disabled {
+  opacity: 1;
+  border-color: #46566b;
+  background: #263447;
+  color: #cbd5e1;
+}
+body.game.night #builder .buildCard:disabled :is(b, small, .price) {
+  color: #0d3669;
+}
+body.game.night #details .sectionHeading,
+body.game.night #details h2,
+body.game.night #details h3,
+body.game.night #details .payment span,
+body.game.night #details .payment b,
+body.game.night #details .service span,
+body.game.night #details .milestone small,
+body.game.night #details .milestone p,
+body.game.night #details #districtBenefits,
+body.game.night #details #selected p,
+body.game.night #details #selected small,
+body.game.night #details .saveState {
+  color: #e5ebf3 !important;
+}
+@media (max-width: 900px), (max-height: 500px) and (pointer: coarse) {
+  body.game.night header.gameHeader .stats > div {
+    height: 52px;
+    gap: 2px;
+    padding: 4px 2px;
+  }
+  body.game.night header.gameHeader .stats small {
+    font-size: 7px;
+    letter-spacing: 0.25px;
+  }
+  body.game.night header.gameHeader .stats strong {
+    font-size: clamp(11px, 3.5vw, 15px);
+    line-height: 18px;
+  }
+}
+@media (max-width: 500px) {
+  .game .dayNightControls {
+    gap: 2px;
+  }
+  .game .dayNightControls button {
+    padding: 6px 7px;
+    font-size: 9px;
+  }
+  .game .mapBottom {
+    gap: 5px;
+  }
+  .game #coords {
+    display: none;
+  }
+}
+body.game.night {
+  background-color: #101722;
+}
+body.game.night header.gameHeader,
+body.game.night #builder,
+body.game.night #details,
+body.game.night footer {
+  border-color: #2c394b;
+  background-color: #182230;
+}
+body.game.night header.gameHeader .stats > div {
+  border-color: #3a4a5f;
+  background-color: #222e3e;
+}
+body.game.night header.gameHeader .headerActions > button {
+  border-color: #394a61;
+  background-color: #222f41;
+  color: #d5e0ef;
+}
+body.game.night header.gameHeader .headerActions > button:hover {
+  background-color: #304158;
+}
+body.game.night
+  :is(
+    .buildCard,
+    .payment,
+    .tip,
+    #selected:not(:empty),
+    .coopStatus,
+    .coopPlayers,
+    .coopSignIn,
+    .menuActions > *,
+    .menuRestart,
+    .worldPromotion,
+    .countryCard,
+    .worldActions,
+    .worldCity,
+    .adminCard,
+    .cityMenu,
+    .coopPanel,
+    .coopRoom,
+    .journalRow
+  ) {
+  border-color: #3b4b60;
+  background-color: #202c3b;
+}
+body.game.night #categories,
+body.game.night .tabs {
+  border-color: #35465b;
+  background-color: #1a2636;
+}
+body.game.night #categories button,
+body.game.night .tabs button {
+  background-color: transparent;
+  color: #bbc8d8;
+}
+body.game.night #categories button.active,
+body.game.night .tabs .active {
+  border-color: #5878a6;
+  background-color: #30435d;
+  color: #e5efff;
+}
+body.game.night button:not(.primary) {
+  border-color: #394a61;
+  background-color: #263448;
+}
+body.game.night button:not(.primary):hover {
+  background-color: #304158;
+}
+body.game.night :is(input, select, textarea) {
+  border-color: #43536a;
+  background-color: #192535;
+}
+body.game.night dialog {
+  border-color: #3b4b60;
+  background-color: #1b2737;
+}
+body.game.night dialog::backdrop {
+  background: #050a12bb;
+}
+body.game.night
+  dialog
+  :is(
+    .worldPromotion,
+    .countryCard,
+    .worldActions,
+    .menuActions > *,
+    .journalRow,
+    .coopPanel,
+    .coopRoom,
+    .worldCity
+  ) {
+  border-color: #3b4b60;
+  background-color: #202e40;
+}
+body.game.night :is(#mapLabel, #toolLabel, .zoom) {
+  border-color: #46566d;
+  background-color: #202c3bef;
+}
+body.game.night .zoom button {
+  background-color: transparent;
+}
+body.game.night .zoom span,
+body.game.night kbd {
+  color: #d0d9e5;
+}
+body.game.night .mobileSheetHeader {
+  border-color: #394a5e;
+}
+body.game.night #mobileNav {
+  border-color: #35465b;
+  background-color: #182230;
+}
+body.game.night #mobileNav button {
+  background-color: transparent;
+  color: #c1ccda;
+}
+body.game.night #mobileNav button.active {
+  background-color: #30435d;
+  color: #edf3fb;
+}
+body.game.night .neighborhoodNote {
+  border-color: #43556d;
+  background-color: #243348;
+}
+body.game.night .worldCity.current {
+  border-color: #5878a6;
+  background-color: #30435d;
+}
+body.game.night .buildCard canvas {
+  filter: brightness(0.82) saturate(0.82);
+}
+body.game.night header.gameHeader #net {
+  color: #8dd5b2;
+}

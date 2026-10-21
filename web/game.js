@@ -4,6 +4,15 @@ let world,city,tool=null,category='Essentials',selected=-1,hover=-1,viewOnly=fal
 try{world=G.validate(JSON.parse(localStorage.getItem('littleCity')));}catch{world=G.fresh(E.fresh('Your city'));}city=G.active(world);
 const canvas=$('map'),ctx=canvas.getContext('2d');let W=0,H=0,scale=1.0,ox=0,oy=0,centered=false,pointers=new Map(),gesture=null,drag=null,lastToast=0;
 const TILE=58;let saveTimer,syncTimer;
+const music=$('backgroundMusic'),DAY_DURATION=5*60*1000,NIGHT_DURATION=2*60*1000;
+let timeMode='auto',isNight=false,nextPhaseAt=Date.now()+DAY_DURATION;
+function syncMusic(){const track=isNight?'../music2.mp3':'../music.mp3';if(music.dataset.track!==track){music.dataset.track=track;music.src=track;music.load();}const playback=music.play();if(playback?.catch)playback.catch(error=>console.warn('Background music playback was blocked:',error));}
+function applyTimeOfDay(night){const changed=isNight!==night;isNight=night;document.body.classList.toggle('night',isNight);if(changed)draw();syncMusic();}
+function updateTimeControls(){if(timeMode==='auto'){const now=Date.now();while(now>=nextPhaseAt){const nextNight=!isNight;nextPhaseAt+=nextNight?NIGHT_DURATION:DAY_DURATION;applyTimeOfDay(nextNight);}}$('dayButton').setAttribute('aria-pressed',String(!isNight));$('nightButton').setAttribute('aria-pressed',String(isNight));$('cycleButton').setAttribute('aria-pressed',String(timeMode==='auto'));$('dayButton').title='Switch to day';$('nightButton').title='Switch to night';$('cycleButton').title='Automatic cycle: 5 minutes day, 2 minutes night';}
+$('dayButton').onclick=()=>{timeMode='manual';applyTimeOfDay(false);updateTimeControls();};
+$('nightButton').onclick=()=>{timeMode='manual';applyTimeOfDay(true);updateTimeControls();};
+$('cycleButton').onclick=()=>{timeMode='auto';nextPhaseAt=Date.now()+DAY_DURATION;applyTimeOfDay(false);updateTimeControls();};
+updateTimeControls();setInterval(updateTimeControls,1000);
 function toast(msg){if($('modal').open){let notice=document.getElementById('modalNotice');if(!notice){notice=document.createElement('p');notice.id='modalNotice';notice.setAttribute('role','status');$('modalContent').prepend(notice);}notice.textContent=msg;}$('toast').textContent=msg;$('toast').classList.add('show');clearTimeout(lastToast);lastToast=setTimeout(()=>$('toast').classList.remove('show'),4500);}
 function persist(){if(viewOnly||window.Coop?.active)return;const unlocked=G.progress(world);G.recalculate(world);if(unlocked)toast(unlocked);try{localStorage.setItem('littleCity',JSON.stringify(world));$('saveState').textContent='Saved on this device';}catch{$('saveState').textContent='Storage full — export a backup';}clearTimeout(syncTimer);syncTimer=setTimeout(sync,1800);}
 async function sync(){if(viewOnly||!cloudEnabled||window.Coop?.active)return;try{const r=await fetch('/api/city',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(world)});if(r.ok)$('saveState').textContent='Saved on device & synced for mayor review';else if(r.status===401)$('saveState').textContent='Local save · sign in to sync';}catch{$('saveState').textContent='Offline · saved on this device';}}

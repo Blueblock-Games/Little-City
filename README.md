@@ -11,6 +11,7 @@ Build houses, roads, schools, hospitals, parks, and businesses. Earn money, expa
 - Build and customize your own city.
 - Earn money and expand over time.
 - Construct buildings and essential services.
+- Watch the city cycle through five minutes of day and two minutes of night, or switch the time manually. Nighttime plays its own music.
 - Invite friends to build together in multiplayer.
 - Play on desktop and mobile.
 
