@@ -1,603 +1,634 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#8dc9ff">
-  <meta name="description" content="Build, grow, and manage your own city in Little City by Blueblock Games.">
-  <link rel="icon" href="web/favicon.svg" type="image/svg+xml">
-  <title>Little City | Blueblock Games</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#8dc9ff" />
+    <meta
+      name="description"
+      content="Build, grow, and manage your own city in Little City by Blueblock Games."
+    />
+    <link rel="icon" href="web/favicon.svg" type="image/svg+xml" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "VideoGame",
+        "@id": "https://blueblock-games.github.io/Little-City/",
+        "name": "Little City",
+        "alternateName": "Blueblock Games - Little City",
+        "url": "https://blueblock-games.github.io/Little-City/",
+        "mainEntityOfPage": "https://blueblock-games.github.io/Little-City/",
+        "description": "Build your dream city entirely in the web with Little City"
+        "operatingSystem": "Any (Web Browser)",
+        "inLanguage": "en",
+        "datePublished": "2026-11-10",
+        "author": {
+          "@type": "Organization",
+          "@id": "https://github.com/Blueblock-Games",
+          "name": "Blueblock Games",
+          "url": "https://github.com/Blueblock-Games"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "@id": "https://github.com/Blueblock-Games",
+          "name": "Blueblock Games",
+          "url": "https://github.com/Blueblock-Games"
+        },
+        "sameAs": [
+          "https://wikidata.org",
+          "https://igdb.com",
+          "https://itch.io",
+          "https://youtube.com",
+          "https://x.com"
+        ]
+      }
+    </script>
 
-  <style>
-    :root {
-      --blue: #3979eb;
-      --blue-dark: #285dc0;
-      --text: #19345e;
-      --muted: #52708f;
-      --white: #ffffff;
-    }
+    <title>Little City | Blueblock Games</title>
 
-    * {
-      box-sizing: border-box;
-    }
+    <style>
+      :root {
+        --blue: #3979eb;
+        --blue-dark: #285dc0;
+        --text: #19345e;
+        --muted: #52708f;
+        --white: #ffffff;
+      }
 
-    html {
-      min-height: 100%;
-    }
+      * {
+        box-sizing: border-box;
+      }
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      min-height: 100dvh;
-      font-family: Arial, Helvetica, sans-serif;
-      background: linear-gradient(
-        180deg,
-        #8dc9ff 0%,
-        #d8efff 65%,
-        #eaf9df 100%
-      );
-      color: var(--text);
-      overflow: hidden;
-      user-select: none;
-    }
+      html {
+        min-height: 100%;
+      }
 
-    button, a {
-      -webkit-tap-highlight-color: transparent;
-    }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        min-height: 100dvh;
+        font-family: Arial, Helvetica, sans-serif;
+        background: linear-gradient(
+          180deg,
+          #8dc9ff 0%,
+          #d8efff 65%,
+          #eaf9df 100%
+        );
+        color: var(--text);
+        overflow: hidden;
+        user-select: none;
+      }
 
-    button {
-      font-family: inherit;
-    }
+      button,
+      a {
+        -webkit-tap-highlight-color: transparent;
+      }
 
-    button:focus-visible,
-    a:focus-visible {
-      outline: 3px solid #173d85;
-      outline-offset: 4px;
-    }
+      button {
+        font-family: inherit;
+      }
 
-    header {
-      max-width: 1100px;
-      margin: auto;
-      padding: 24px 28px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
+      button:focus-visible,
+      a:focus-visible {
+        outline: 3px solid #173d85;
+        outline-offset: 4px;
+      }
 
-    .brand {
-      font-size: 19px;
-      font-weight: 500;
-      letter-spacing: -0.7px;
-      white-space: nowrap;
-    }
-
-    .brand span {
-      color: var(--blue);
-    }
-
-    .studio {
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.8px;
-      color: #45688e;
-      text-align: right;
-    }
-
-    main {
-      max-width: 1100px;
-      margin: auto;
-      padding: 48px 24px 45px;
-      text-align: center;
-    }
-
-    .pill {
-      display: inline-block;
-      padding: 9px 17px;
-      border-radius: 100px;
-      background: #ffffffa8;
-      border: 1px solid #ffffff;
-      color: #3866a1;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-    }
-
-    h1 {
-      margin: 24px 0 18px;
-      font-size: clamp(54px, 11vw, 104px);
-      font-weight: 500;
-      line-height: 1.05;
-      letter-spacing: -4px;
-    }
-
-    h1 span {
-      color: var(--blue);
-    }
-
-    .subtitle {
-      max-width: 520px;
-      margin: 0 auto;
-      color: #496788;
-      font-size: clamp(16px, 2vw, 19px);
-      line-height: 1.65;
-    }
-
-    .actions {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 13px;
-      margin-top: 32px;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 9px;
-      min-height: 52px;
-      min-width: 145px;
-      padding: 15px 25px;
-      border: 0;
-      border-radius: 16px;
-      font-size: 15px;
-      font-weight: 600;
-      line-height: 1.3;
-      text-decoration: none;
-      cursor: pointer;
-      transition: transform 0.18s, background 0.18s;
-    }
-
-    .btn:hover {
-      transform: translateY(-2px);
-    }
-
-    .btn:active {
-      transform: translateY(1px);
-    }
-
-    .play {
-      background: var(--blue);
-      color: white;
-      box-shadow:
-        0 5px 0 var(--blue-dark),
-        0 10px 22px #3979eb25;
-    }
-
-    .play:hover {
-      background: #316edc;
-    }
-
-    .secondary {
-      background: white;
-      color: var(--text);
-      box-shadow: 0 5px 0 #c9dff0;
-    }
-
-    .secondary:hover {
-      background: #f5faff;
-    }
-
-    .music-btn {
-      min-width: 115px;
-    }
-
-    .music-btn[aria-pressed="true"] {
-      background: #e4f1ff;
-      color: #245bb4;
-    }
-
-    .btn svg {
-      width: 19px;
-      height: 19px;
-      flex-shrink: 0;
-    }
-
-    .city {
-      margin: 55px auto 0;
-      max-width: 850px;
-      height: 240px;
-      position: relative;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      gap: 12px;
-      padding: 0 20px 23px;
-      border-bottom: 17px solid #78c67a;
-      user-select: none;
-      pointer-events: none;
-    }
-
-    .building {
-      position: relative;
-      width: 85px;
-      height: var(--h);
-      border-radius: 9px 9px 0 0;
-      background: var(--c);
-      box-shadow:
-        inset -12px 0 #00000012,
-        0 6px 0 #00000010;
-      display: grid;
-      grid-template-columns: repeat(2, 16px);
-      grid-auto-rows: 20px;
-      justify-content: center;
-      align-content: start;
-      gap: 14px;
-      padding-top: 17px;
-      flex-shrink: 1;
-    }
-
-    .building i {
-      background: #fff5bc;
-      border-radius: 3px;
-      box-shadow: inset -3px 0 #e6ce83;
-    }
-
-    .building:nth-child(3) {
-      width: 110px;
-    }
-
-    .building:nth-child(5) {
-      width: 100px;
-    }
-
-    .tree {
-      width: 50px;
-      height: 75px;
-      position: relative;
-      flex-shrink: 0;
-    }
-
-    .tree::before {
-      content: "";
-      position: absolute;
-      width: 12px;
-      height: 42px;
-      bottom: 0;
-      left: 19px;
-      background: #98643f;
-    }
-
-    .tree::after {
-      content: "";
-      position: absolute;
-      width: 55px;
-      height: 55px;
-      left: -2px;
-      top: 0;
-      border-radius: 50%;
-      background: #49b96d;
-      box-shadow: inset -9px -6px #259e53;
-    }
-
-    footer {
-      padding: 22px 20px 30px;
-      text-align: center;
-      color: #58718d;
-      font-size: 13px;
-    }
-
-    dialog {
-      width: min(92vw, 460px);
-      max-height: min(85vh, 700px);
-      overflow-y: auto;
-      border: none;
-      border-radius: 24px;
-      padding: 30px;
-      background: white;
-      color: var(--text);
-      box-shadow: 0 25px 90px #17345b55;
-    }
-
-    dialog::backdrop {
-      background: #142c4a80;
-      backdrop-filter: blur(5px);
-    }
-
-    dialog h2 {
-      margin: 0 0 12px;
-      font-size: 25px;
-      font-weight: 600;
-    }
-
-    dialog p,
-    dialog li {
-      color: #526b86;
-      line-height: 1.7;
-    }
-
-    dialog ol {
-      padding-left: 23px;
-    }
-
-    dialog li {
-      margin-bottom: 8px;
-    }
-
-    dialog .btn {
-      width: 100%;
-      margin-top: 12px;
-    }
-
-    @media (max-width: 600px) {
       header {
-        padding: 19px;
+        max-width: 1100px;
+        margin: auto;
+        padding: 24px 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .brand {
+        font-size: 19px;
+        font-weight: 500;
+        letter-spacing: -0.7px;
+        white-space: nowrap;
+      }
+
+      .brand span {
+        color: var(--blue);
+      }
+
+      .studio {
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.8px;
+        color: #45688e;
+        text-align: right;
       }
 
       main {
-        padding: 45px 18px 30px;
+        max-width: 1100px;
+        margin: auto;
+        padding: 48px 24px 45px;
+        text-align: center;
+      }
+
+      .pill {
+        display: inline-block;
+        padding: 9px 17px;
+        border-radius: 100px;
+        background: #ffffffa8;
+        border: 1px solid #ffffff;
+        color: #3866a1;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
       }
 
       h1 {
-        letter-spacing: -3px;
+        margin: 24px 0 18px;
+        font-size: clamp(54px, 11vw, 104px);
+        font-weight: 500;
+        line-height: 1.05;
+        letter-spacing: -4px;
+      }
+
+      h1 span {
+        color: var(--blue);
+      }
+
+      .subtitle {
+        max-width: 520px;
+        margin: 0 auto;
+        color: #496788;
+        font-size: clamp(16px, 2vw, 19px);
+        line-height: 1.65;
       }
 
       .actions {
-        gap: 11px;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 13px;
+        margin-top: 32px;
       }
 
-      .actions .btn {
-        flex: 1 1 135px;
-        min-width: 0;
-        padding: 14px 12px;
-        font-size: 14px;
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        min-height: 52px;
+        min-width: 145px;
+        padding: 15px 25px;
+        border: 0;
+        border-radius: 16px;
+        font-size: 15px;
+        font-weight: 600;
+        line-height: 1.3;
+        text-decoration: none;
+        cursor: pointer;
+        transition:
+          transform 0.18s,
+          background 0.18s;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+
+      .btn:active {
+        transform: translateY(1px);
+      }
+
+      .play {
+        background: var(--blue);
+        color: white;
+        box-shadow:
+          0 5px 0 var(--blue-dark),
+          0 10px 22px #3979eb25;
+      }
+
+      .play:hover {
+        background: #316edc;
+      }
+
+      .secondary {
+        background: white;
+        color: var(--text);
+        box-shadow: 0 5px 0 #c9dff0;
+      }
+
+      .secondary:hover {
+        background: #f5faff;
       }
 
       .music-btn {
-        flex: 0 1 150px !important;
+        min-width: 115px;
+      }
+
+      .music-btn[aria-pressed="true"] {
+        background: #e4f1ff;
+        color: #245bb4;
+      }
+
+      .btn svg {
+        width: 19px;
+        height: 19px;
+        flex-shrink: 0;
       }
 
       .city {
-        gap: 6px;
-        height: 170px;
-        margin-top: 42px;
-        padding-inline: 4px;
+        margin: 55px auto 0;
+        max-width: 850px;
+        height: 240px;
+        position: relative;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 12px;
+        padding: 0 20px 23px;
+        border-bottom: 17px solid #78c67a;
+        user-select: none;
+        pointer-events: none;
       }
 
       .building {
-        width: 48px;
-        height: calc(var(--h) * 0.7);
-        grid-template-columns: repeat(2, 9px);
-        grid-auto-rows: 13px;
-        gap: 8px;
-        padding-top: 10px;
+        position: relative;
+        width: 85px;
+        height: var(--h);
+        border-radius: 9px 9px 0 0;
+        background: var(--c);
+        box-shadow:
+          inset -12px 0 #00000012,
+          0 6px 0 #00000010;
+        display: grid;
+        grid-template-columns: repeat(2, 16px);
+        grid-auto-rows: 20px;
+        justify-content: center;
+        align-content: start;
+        gap: 14px;
+        padding-top: 17px;
+        flex-shrink: 1;
       }
 
-      .building:nth-child(3),
+      .building i {
+        background: #fff5bc;
+        border-radius: 3px;
+        box-shadow: inset -3px 0 #e6ce83;
+      }
+
+      .building:nth-child(3) {
+        width: 110px;
+      }
+
       .building:nth-child(5) {
-        width: 65px;
+        width: 100px;
       }
 
       .tree {
-        transform: scale(0.65);
-        width: 30px;
-        transform-origin: bottom center;
+        width: 50px;
+        height: 75px;
+        position: relative;
+        flex-shrink: 0;
+      }
+
+      .tree::before {
+        content: "";
+        position: absolute;
+        width: 12px;
+        height: 42px;
+        bottom: 0;
+        left: 19px;
+        background: #98643f;
+      }
+
+      .tree::after {
+        content: "";
+        position: absolute;
+        width: 55px;
+        height: 55px;
+        left: -2px;
+        top: 0;
+        border-radius: 50%;
+        background: #49b96d;
+        box-shadow: inset -9px -6px #259e53;
+      }
+
+      footer {
+        padding: 22px 20px 30px;
+        text-align: center;
+        color: #58718d;
+        font-size: 13px;
       }
 
       dialog {
-        padding: 24px;
-      }
-    }
-
-    @media (max-width: 360px) {
-      .studio {
-        font-size: 10px;
-      }
-
-      .city {
-        gap: 3px;
+        width: min(92vw, 460px);
+        max-height: min(85vh, 700px);
+        overflow-y: auto;
+        border: none;
+        border-radius: 24px;
+        padding: 30px;
+        background: white;
+        color: var(--text);
+        box-shadow: 0 25px 90px #17345b55;
       }
 
-      .tree {
-        display: none;
+      dialog::backdrop {
+        background: #142c4a80;
+        backdrop-filter: blur(5px);
       }
-    }
 
-    @media (prefers-reduced-motion: reduce) {
-      *,
-      *::before,
-      *::after {
-        transition: none !important;
+      dialog h2 {
+        margin: 0 0 12px;
+        font-size: 25px;
+        font-weight: 600;
       }
-    }
-  </style>
-</head>
 
-<body>
-  <header>
-    <div class="brand">
-      Little <span>City.</span>
-    </div>
+      dialog p,
+      dialog li {
+        color: #526b86;
+        line-height: 1.7;
+      }
 
-    <div class="studio">
-      BLUEBLOCK GAMES
-    </div>
-  </header>
+      dialog ol {
+        padding-left: 23px;
+      }
 
-  <main>
-    <div class="pill">
-      YOUR WORLD, YOUR CREATION
-    </div>
+      dialog li {
+        margin-bottom: 8px;
+      }
 
-    <h1>
-      Little <span>City.</span>
-    </h1>
+      dialog .btn {
+        width: 100%;
+        margin-top: 12px;
+      }
 
-    <p class="subtitle">
-      Big dreams start in a little city.
-      Build, grow, and create your very own world,
-      one building at a time.
-    </p>
-
-    <div class="actions">
-      <a class="btn play" href="web/index.html">
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M7 4.5a1.5 1.5 0 0 1 2.3-1.27l11 7.5a1.5 1.5 0 0 1 0 2.54l-11 7.5A1.5 1.5 0 0 1 7 19.5z"/>
-        </svg>
-        Play Now
-      </a>
-
-      <button class="btn secondary" id="helpBtn" type="button">
-        Help &amp; How to Play
-      </button>
-
-      <button
-        class="btn secondary music-btn"
-        id="musicBtn"
-        type="button"
-        aria-pressed="false"
-        aria-label="Turn background music on"
-      >
-        <svg viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2"
-             stroke-linecap="round" stroke-linejoin="round"
-             aria-hidden="true">
-          <path d="M9 18V5l12-2v13"/>
-          <circle cx="6" cy="18" r="3"/>
-          <circle cx="18" cy="16" r="3"/>
-        </svg>
-        <span id="musicLabel">Music Off</span>
-      </button>
-    </div>
-
-    <div class="city" aria-hidden="true">
-      <div class="tree"></div>
-
-      <div class="building" style="--h:110px;--c:#f5a95c">
-        <i></i><i></i><i></i><i></i>
-      </div>
-
-      <div class="building" style="--h:160px;--c:#719bed">
-        <i></i><i></i><i></i><i></i><i></i><i></i>
-      </div>
-
-      <div class="building" style="--h:205px;--c:#ffcf62">
-        <i></i><i></i><i></i><i></i>
-        <i></i><i></i><i></i><i></i>
-      </div>
-
-      <div class="building" style="--h:135px;--c:#f18e9e">
-        <i></i><i></i><i></i><i></i>
-      </div>
-
-      <div class="building" style="--h:180px;--c:#8bc8ac">
-        <i></i><i></i><i></i><i></i><i></i>
-      </div>
-
-      <div class="tree"></div>
-    </div>
-  </main>
-
-  <footer>
-    &copy; <span id="year">2026</span> Blueblock Games.
-    Small Blocks. Big Ideas.
-  </footer>
-
-  <dialog id="helpDialog" aria-labelledby="helpTitle">
-    <h2 id="helpTitle">How to Play Little City</h2>
-
-    <p>
-      Ready to become the mayor?
-      Here's how to get started.
-    </p>
-
-    <ol>
-      <li>
-        <strong>Name your city.</strong>
-        Choose a name for your new world.
-      </li>
-      <li>
-        <strong>Start building.</strong>
-        Place roads, houses, and other buildings.
-      </li>
-      <li>
-        <strong>Earn money.</strong>
-        Your city generates income over time.
-      </li>
-      <li>
-        <strong>Keep expanding.</strong>
-        Add schools, hospitals, parks, and services.
-      </li>
-      <li>
-        <strong>Play together.</strong>
-        Collaborate with friends using multiplayer features.
-      </li>
-    </ol>
-
-    <button class="btn play" id="closeHelp" type="button">
-      Got It!
-    </button>
-  </dialog>
-
-  <script>
-    // Help dialog
-
-    const helpDialog = document.getElementById("helpDialog");
-    const helpBtn = document.getElementById("helpBtn");
-    const closeHelp = document.getElementById("closeHelp");
-
-    helpBtn.addEventListener("click", () => {
-      helpDialog.showModal();
-    });
-
-    closeHelp.addEventListener("click", () => {
-      helpDialog.close();
-    });
-
-    document.getElementById("year").textContent =
-      new Date().getFullYear();
-
-
-    
-    // Little City background music
-    const musicBtn = document.getElementById("musicBtn");
-    const musicLabel = document.getElementById("musicLabel");
-
-    const music = new Audio("music.mp3");
-    music.loop = true;
-    music.volume = 0.35;
-    music.preload = "auto";
-
-    function updateMusicButton() {
-      const playing = !music.paused;
-
-      musicLabel.textContent = playing ? "Music On" : "Music Off";
-      musicBtn.setAttribute("aria-pressed", String(playing));
-      musicBtn.setAttribute(
-        "aria-label",
-        playing ? "Turn background music off" : "Turn background music on"
-      );
-    }
-
-    musicBtn.addEventListener("click", async () => {
-      if (music.paused) {
-        try {
-          await music.play();
-        } catch (error) {
-          console.error("Could not play music.mp3:", error);
+      @media (max-width: 600px) {
+        header {
+          padding: 19px;
         }
-      } else {
-        music.pause();
+
+        main {
+          padding: 45px 18px 30px;
+        }
+
+        h1 {
+          letter-spacing: -3px;
+        }
+
+        .actions {
+          gap: 11px;
+        }
+
+        .actions .btn {
+          flex: 1 1 135px;
+          min-width: 0;
+          padding: 14px 12px;
+          font-size: 14px;
+        }
+
+        .music-btn {
+          flex: 0 1 150px !important;
+        }
+
+        .city {
+          gap: 6px;
+          height: 170px;
+          margin-top: 42px;
+          padding-inline: 4px;
+        }
+
+        .building {
+          width: 48px;
+          height: calc(var(--h) * 0.7);
+          grid-template-columns: repeat(2, 9px);
+          grid-auto-rows: 13px;
+          gap: 8px;
+          padding-top: 10px;
+        }
+
+        .building:nth-child(3),
+        .building:nth-child(5) {
+          width: 65px;
+        }
+
+        .tree {
+          transform: scale(0.65);
+          width: 30px;
+          transform-origin: bottom center;
+        }
+
+        dialog {
+          padding: 24px;
+        }
       }
 
-      updateMusicButton();
-    });
+      @media (max-width: 360px) {
+        .studio {
+          font-size: 10px;
+        }
 
-    music.addEventListener("play", updateMusicButton);
-    music.addEventListener("pause", updateMusicButton);
+        .city {
+          gap: 3px;
+        }
 
-    music.addEventListener("error", () => {
-      console.error("Failed to load music.mp3");
-      updateMusicButton();
-    });
+        .tree {
+          display: none;
+        }
+      }
 
-    window.addEventListener("pagehide", () => {
-      music.pause();
-    });
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
 
-  </script>
-</body>
+  <body>
+    <header>
+      <div class="brand">Little <span>City.</span></div>
+
+      <div class="studio">BLUEBLOCK GAMES</div>
+    </header>
+
+    <main>
+      <div class="pill">YOUR WORLD, YOUR CREATION</div>
+
+      <h1>Little <span>City.</span></h1>
+
+      <p class="subtitle">
+        Big dreams start in a little city. Build, grow, and create your very own
+        world, one building at a time.
+      </p>
+
+      <div class="actions">
+        <a class="btn play" href="web/index.html">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path
+              d="M7 4.5a1.5 1.5 0 0 1 2.3-1.27l11 7.5a1.5 1.5 0 0 1 0 2.54l-11 7.5A1.5 1.5 0 0 1 7 19.5z"
+            />
+          </svg>
+          Play Now
+        </a>
+
+        <button class="btn secondary" id="helpBtn" type="button">
+          Help &amp; How to Play
+        </button>
+
+        <button
+          class="btn secondary music-btn"
+          id="musicBtn"
+          type="button"
+          aria-pressed="false"
+          aria-label="Turn background music on"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M9 18V5l12-2v13" />
+            <circle cx="6" cy="18" r="3" />
+            <circle cx="18" cy="16" r="3" />
+          </svg>
+          <span id="musicLabel">Music Off</span>
+        </button>
+      </div>
+
+      <div class="city" aria-hidden="true">
+        <div class="tree"></div>
+
+        <div class="building" style="--h: 110px; --c: #f5a95c">
+          <i></i><i></i><i></i><i></i>
+        </div>
+
+        <div class="building" style="--h: 160px; --c: #719bed">
+          <i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+
+        <div class="building" style="--h: 205px; --c: #ffcf62">
+          <i></i><i></i><i></i><i></i> <i></i><i></i><i></i><i></i>
+        </div>
+
+        <div class="building" style="--h: 135px; --c: #f18e9e">
+          <i></i><i></i><i></i><i></i>
+        </div>
+
+        <div class="building" style="--h: 180px; --c: #8bc8ac">
+          <i></i><i></i><i></i><i></i><i></i>
+        </div>
+
+        <div class="tree"></div>
+      </div>
+    </main>
+
+    <footer>
+      &copy; <span id="year">2026</span> Blueblock Games. Small Blocks. Big
+      Ideas.
+    </footer>
+
+    <dialog id="helpDialog" aria-labelledby="helpTitle">
+      <h2 id="helpTitle">How to Play Little City</h2>
+
+      <p>Ready to become the mayor? Here's how to get started.</p>
+
+      <ol>
+        <li>
+          <strong>Name your city.</strong>
+          Choose a name for your new world.
+        </li>
+        <li>
+          <strong>Start building.</strong>
+          Place roads, houses, and other buildings.
+        </li>
+        <li>
+          <strong>Earn money.</strong>
+          Your city generates income over time.
+        </li>
+        <li>
+          <strong>Keep expanding.</strong>
+          Add schools, hospitals, parks, and services.
+        </li>
+        <li>
+          <strong>Play together.</strong>
+          Collaborate with friends using multiplayer features.
+        </li>
+      </ol>
+
+      <button class="btn play" id="closeHelp" type="button">Got It!</button>
+    </dialog>
+
+    <script>
+      // Help dialog
+
+      const helpDialog = document.getElementById("helpDialog");
+      const helpBtn = document.getElementById("helpBtn");
+      const closeHelp = document.getElementById("closeHelp");
+
+      helpBtn.addEventListener("click", () => {
+        helpDialog.showModal();
+      });
+
+      closeHelp.addEventListener("click", () => {
+        helpDialog.close();
+      });
+
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      // Little City background music
+      const musicBtn = document.getElementById("musicBtn");
+      const musicLabel = document.getElementById("musicLabel");
+
+      const music = new Audio("music.mp3");
+      music.loop = true;
+      music.volume = 0.35;
+      music.preload = "auto";
+
+      function updateMusicButton() {
+        const playing = !music.paused;
+
+        musicLabel.textContent = playing ? "Music On" : "Music Off";
+        musicBtn.setAttribute("aria-pressed", String(playing));
+        musicBtn.setAttribute(
+          "aria-label",
+          playing ? "Turn background music off" : "Turn background music on",
+        );
+      }
+
+      musicBtn.addEventListener("click", async () => {
+        if (music.paused) {
+          try {
+            await music.play();
+          } catch (error) {
+            console.error("Could not play music.mp3:", error);
+          }
+        } else {
+          music.pause();
+        }
+
+        updateMusicButton();
+      });
+
+      music.addEventListener("play", updateMusicButton);
+      music.addEventListener("pause", updateMusicButton);
+
+      music.addEventListener("error", () => {
+        console.error("Failed to load music.mp3");
+        updateMusicButton();
+      });
+
+      window.addEventListener("pagehide", () => {
+        music.pause();
+      });
+    </script>
+  </body>
 </html>
